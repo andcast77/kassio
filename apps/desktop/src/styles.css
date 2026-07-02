@@ -334,6 +334,126 @@ h2 {
   margin-bottom: 0.75rem;
 }
 
+.pos-session-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.65rem 1rem;
+  flex-shrink: 0;
+}
+
+.pos-session-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.pos-session-badge {
+  background: #1a3d2a;
+  color: #7dffb0;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.pos-session-stats {
+  display: flex;
+  gap: 1.25rem;
+  font-size: 0.9rem;
+}
+
+.pos-category-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.65rem;
+}
+
+.pos-category-chip {
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid #2a3a57;
+  background: #0d1424;
+  color: #c8d4ea;
+  font-size: 0.82rem;
+}
+
+.pos-category-chip.active {
+  background: #1a2844;
+  border-color: #4a6fa5;
+  color: #fff;
+}
+
+.pos-product-low-stock {
+  border-color: #6b4a1a;
+}
+
+.pos-stock-warn {
+  color: #ffb347;
+}
+
+.pos-cart-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.pos-clear-cart {
+  font-size: 0.85rem;
+  padding: 0.25rem 0.6rem;
+}
+
+.pos-payment-breakdown {
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  background: #0d1424;
+  border-radius: 8px;
+}
+
+.pos-payment-methods {
+  border: none;
+  margin: 0 0 1rem;
+  padding: 0;
+}
+
+.pos-payment-methods legend {
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.pos-payment-method-btns {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+}
+
+.pos-payment-method-btn {
+  padding: 0.55rem 0.75rem;
+  border: 1px solid #2a3a57;
+  background: #0d1424;
+  border-radius: 8px;
+}
+
+.pos-payment-method-btn.active {
+  border-color: #4a6fa5;
+  background: #1a2844;
+}
+
+.pos-quick-cash {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.75rem;
+}
+
+.pos-receipt-actions {
+  flex-wrap: wrap;
+}
+
 .pos-search-input {
   width: 100%;
 }

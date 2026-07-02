@@ -1,8 +1,19 @@
 import { cartStore, useCartStore } from '../../store/cartStore'
 import { formatCurrency } from '../../lib/formatCurrency'
 
-export function ShoppingCart() {
+type Props = {
+  onNotify?: (message: { type: 'ok' | 'error'; text: string }) => void
+}
+
+export function ShoppingCart({ onNotify }: Props) {
   const items = useCartStore((s) => s.getState().items)
+
+  function handleClear() {
+    if (items.length === 0) return
+    if (!window.confirm('¿Vaciar el carrito?')) return
+    cartStore.clearCart()
+    onNotify?.({ type: 'ok', text: 'Carrito vaciado' })
+  }
 
   if (items.length === 0) {
     return (
@@ -15,12 +26,17 @@ export function ShoppingCart() {
 
   return (
     <section className="pos-cart card">
-      <h2>
-        Carrito de compra
-        <span className="muted pos-cart-count">
-          ({items.length} {items.length === 1 ? 'producto' : 'productos'})
-        </span>
-      </h2>
+      <div className="pos-cart-head">
+        <h2>
+          Carrito de compra
+          <span className="muted pos-cart-count">
+            ({items.length} {items.length === 1 ? 'producto' : 'productos'})
+          </span>
+        </h2>
+        <button type="button" className="ghost pos-clear-cart" onClick={handleClear}>
+          Vaciar
+        </button>
+      </div>
 
       <div className="pos-cart-table-wrap">
         <div className="pos-cart-header">
@@ -52,8 +68,13 @@ export function ShoppingCart() {
                   type="button"
                   className="ghost pos-qty-btn"
                   onClick={() => {
-                    if (item.quantity + 1 > item.product.stockQuantity) return
-                    cartStore.updateQuantity(item.product.id, item.quantity + 1)
+                    const ok = cartStore.updateQuantity(item.product.id, item.quantity + 1)
+                    if (!ok) {
+                      onNotify?.({
+                        type: 'error',
+                        text: `Stock máximo: ${item.product.stockQuantity}`,
+                      })
+                    }
                   }}
                 >
                   +

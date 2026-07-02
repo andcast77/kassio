@@ -16,11 +16,12 @@ const CASHIER_PASSWORD = 'Cajero123!'
 async function main() {
   const business = await prisma.business.upsert({
     where: { id: 'seed-business' },
-    update: {},
+    update: { taxRate: 0.21 },
     create: {
       id: 'seed-business',
       name: 'Kassio Demo',
       taxId: '30-00000000-0',
+      taxRate: 0.21,
       address: 'Av. Demo 123',
       phone: '+54 11 0000-0000',
     },

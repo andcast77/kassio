@@ -1,7 +1,8 @@
 import { CashSessionStatus, prisma, SaleStatus, StockMovementType, type PaymentMethod } from '@kassio/database'
 import { AppError } from '../lib/errors.js'
 import { dec } from '../lib/decimal.js'
-import { computeSaleTotals, validateCashPayment } from '../lib/sale-totals.js'
+import { computeChange, computeSaleTotals, validateCashPayment } from '../lib/sale-totals.js'
+import { getBusinessTaxRate } from './business.service.js'
 
 function serializeSale(sale: {
   id: string
@@ -13,10 +14,20 @@ function serializeSale(sale: {
   paymentMethod: PaymentMethod
   subtotal: { toString(): string }
   discount: { toString(): string }
+  tax: { toString(): string }
   total: { toString(): string }
+  paidAmount: { toString(): string } | null
+  change: { toString(): string } | null
+  notes: string | null
   createdAt: Date
   user?: { id: string; name: string; email: string }
-  customer?: { id: string; name: string; email?: string | null; phone?: string | null } | null
+  customer?: {
+    id: string
+    name: string
+    email?: string | null
+    phone?: string | null
+    taxId?: string | null
+  } | null
   items?: Array<{
     id: string
     productId: string
@@ -36,7 +47,11 @@ function serializeSale(sale: {
     paymentMethod: sale.paymentMethod,
     subtotal: dec(sale.subtotal)!,
     discount: dec(sale.discount)!,
+    tax: dec(sale.tax)!,
     total: dec(sale.total)!,
+    paidAmount: dec(sale.paidAmount),
+    change: dec(sale.change),
+    notes: sale.notes,
     createdAt: sale.createdAt.toISOString(),
     user: sale.user,
     customer: sale.customer ?? null,
@@ -68,6 +83,7 @@ export async function createSale(
     paymentMethod: PaymentMethod
     discount?: number
     paidAmount?: number
+    notes?: string | null
   },
 ) {
   if (data.items.length === 0) {
@@ -104,17 +120,25 @@ export async function createSale(
     })
   }
 
+  const taxRate = await getBusinessTaxRate()
+
   let totals
   try {
     totals = computeSaleTotals(
       lineItems.map(({ quantity, unitPrice }) => ({ quantity, unitPrice })),
       data.discount ?? 0,
+      taxRate,
     )
   } catch {
     throw new AppError(400, 'Descuento inválido', 'VALIDATION_ERROR')
   }
 
-  if (data.paymentMethod === 'CASH' && data.paidAmount != null && !validateCashPayment(data.paidAmount, totals.total)) {
+  const paidAmount =
+    data.paymentMethod === 'CASH' && data.paidAmount != null ? data.paidAmount : null
+  const changeAmount =
+    paidAmount != null ? computeChange(paidAmount, totals.total) : null
+
+  if (data.paymentMethod === 'CASH' && paidAmount != null && !validateCashPayment(paidAmount, totals.total)) {
     throw new AppError(400, 'El monto pagado es menor que el total', 'VALIDATION_ERROR')
   }
 
@@ -138,7 +162,11 @@ export async function createSale(
         paymentMethod: data.paymentMethod,
         subtotal: totals.subtotal,
         discount: totals.discount,
+        tax: totals.tax,
         total: totals.total,
+        paidAmount,
+        change: changeAmount,
+        notes: data.notes?.trim() || null,
         status: SaleStatus.COMPLETED,
         items: {
           create: lineItems.map((item) => ({
@@ -151,7 +179,7 @@ export async function createSale(
       },
       include: {
         user: { select: { id: true, name: true, email: true } },
-        customer: { select: { id: true, name: true, email: true, phone: true } },
+        customer: { select: { id: true, name: true, email: true, phone: true, taxId: true } },
         items: { include: { product: { select: { id: true, name: true, sku: true } } } },
       },
     })
@@ -226,7 +254,7 @@ export async function getSaleById(id: string) {
     where: { id },
     include: {
       user: { select: { id: true, name: true, email: true } },
-      customer: { select: { id: true, name: true, email: true, phone: true } },
+      customer: { select: { id: true, name: true, email: true, phone: true, taxId: true } },
       items: { include: { product: { select: { id: true, name: true, sku: true, barcode: true } } } },
     },
   })

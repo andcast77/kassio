@@ -54,12 +54,13 @@ export const cartStore = {
 
   addItem: (product: CartProduct, quantity = 1) => {
     const existing = state.items.find((item) => item.product.id === product.id)
+    const nextQty = (existing?.quantity ?? 0) + quantity
+    if (nextQty > product.stockQuantity) return false
+
     if (existing) {
       setState({
         items: state.items.map((item) =>
-          item.product.id === product.id
-            ? { ...item, quantity: item.quantity + quantity }
-            : item,
+          item.product.id === product.id ? { ...item, quantity: nextQty, product } : item,
         ),
       })
     } else {
@@ -67,6 +68,7 @@ export const cartStore = {
         items: [...state.items, { product, quantity, discount: 0 }],
       })
     }
+    return true
   },
 
   removeItem: (productId: string) => {
@@ -76,13 +78,16 @@ export const cartStore = {
   updateQuantity: (productId: string, quantity: number) => {
     if (quantity <= 0) {
       cartStore.removeItem(productId)
-      return
+      return false
     }
+    const item = state.items.find((i) => i.product.id === productId)
+    if (item && quantity > item.product.stockQuantity) return false
     setState({
       items: state.items.map((item) =>
         item.product.id === productId ? { ...item, quantity } : item,
       ),
     })
+    return true
   },
 
   updateDiscount: (productId: string, discount: number) => {
@@ -102,9 +107,26 @@ export const cartStore = {
     setState({ customerId })
   },
 
-  clearCart: () => {
-    setState({ items: [], customerId: null, discount: 0 })
+  clearCart: (options?: { keepCustomer?: boolean }) => {
+    setState({
+      items: [],
+      customerId: options?.keepCustomer ? state.customerId : null,
+      discount: 0,
+    })
   },
+
+  syncProductStocks: (stockById: Record<string, number>) => {
+    setState({
+      items: state.items.map((item) => {
+        const stock = stockById[item.product.id]
+        if (stock === undefined) return item
+        return { ...item, product: { ...item.product, stockQuantity: stock } }
+      }),
+    })
+  },
+
+  getTax: (taxRate: number) => cartStore.getSubtotal() * taxRate,
+  getTotalWithTax: (taxRate: number) => cartStore.getSubtotal() * (1 + taxRate),
 
   getFullSubtotal: () => fullSubtotal(state.items),
   getSubtotalBeforeGlobal: () => subtotalBeforeGlobal(state.items),

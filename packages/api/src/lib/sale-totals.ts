@@ -6,6 +6,7 @@ export type SaleLineInput = {
 export type SaleTotals = {
   subtotal: number
   discount: number
+  tax: number
   total: number
   lineItems: Array<SaleLineInput & { lineTotal: number }>
 }
@@ -13,6 +14,7 @@ export type SaleTotals = {
 export function computeSaleTotals(
   items: SaleLineInput[],
   discount = 0,
+  taxRate = 0,
 ): SaleTotals {
   const lineItems = items.map((item) => ({
     ...item,
@@ -24,10 +26,14 @@ export function computeSaleTotals(
     throw new Error('Descuento inválido')
   }
 
+  const afterDiscount = subtotal - discount
+  const tax = afterDiscount * taxRate
+
   return {
     subtotal,
     discount,
-    total: subtotal - discount,
+    tax,
+    total: afterDiscount + tax,
     lineItems,
   }
 }

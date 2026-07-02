@@ -12,8 +12,8 @@ export function TotalsPanel({ onCheckout, taxRate = 0 }: Props) {
   const subtotalBeforeGlobal = useCartStore((s) => s.getSubtotalBeforeGlobal())
   const globalDiscountAmount = useCartStore((s) => s.getGlobalDiscountAmount())
   const subtotal = useCartStore((s) => s.getSubtotal())
-  const tax = subtotal * taxRate
-  const total = subtotal + tax
+  const tax = useCartStore((s) => s.getTax(taxRate))
+  const total = useCartStore((s) => s.getTotalWithTax(taxRate))
   const canCheckout = items.length > 0 && total > 0
 
   return (
@@ -46,7 +46,7 @@ export function TotalsPanel({ onCheckout, taxRate = 0 }: Props) {
         )}
         {taxRate > 0 && (
           <div className="ticket-row">
-            <span>Impuesto ({taxRate * 100}%)</span>
+            <span>IVA ({taxRate * 100}%)</span>
             <span>{formatCurrency(tax)}</span>
           </div>
         )}
@@ -57,7 +57,7 @@ export function TotalsPanel({ onCheckout, taxRate = 0 }: Props) {
       </div>
 
       <button type="button" className="pos-checkout-btn" disabled={!canCheckout} onClick={onCheckout}>
-        Procesar pago
+        Procesar pago (F4)
       </button>
     </section>
   )

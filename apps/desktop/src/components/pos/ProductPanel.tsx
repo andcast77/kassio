@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { fetchProductsPage, type Product } from '../../api'
+import { fetchCategories, fetchProductsPage, type Category, type Product } from '../../api'
 import { useBarcodeScanner } from '../../hooks/useBarcodeScanner'
 import { cartStore, type CartProduct } from '../../store/cartStore'
 import { formatCurrency } from '../../lib/formatCurrency'
 
 type Props = {
   onNotify?: (message: { type: 'ok' | 'error'; text: string }) => void
+  refreshKey?: number
+  onSearchRef?: (el: HTMLInputElement | null) => void
 }
 
 const SCROLL_GAP_X = 12
@@ -25,8 +27,10 @@ function toCartProduct(p: Product): CartProduct {
   }
 }
 
-export function ProductPanel({ onNotify }: Props) {
+export function ProductPanel({ onNotify, refreshKey = 0, onSearchRef }: Props) {
   const [search, setSearch] = useState('')
+  const [categoryId, setCategoryId] = useState<string | null>(null)
+  const [categories, setCategories] = useState<Category[]>([])
   const [scanPendingCode, setScanPendingCode] = useState<string | null>(null)
   const [page, setPage] = useState(1)
   const [products, setProducts] = useState<Product[]>([])
@@ -49,10 +53,17 @@ export function ProductPanel({ onNotify }: Props) {
 
   useEffect(() => {
     if (searchInputRef.current) barcodeRef.current = searchInputRef.current
-  }, [barcodeRef])
+    onSearchRef?.(searchInputRef.current)
+  }, [barcodeRef, onSearchRef])
 
   useEffect(() => {
     searchInputRef.current?.focus()
+  }, [])
+
+  useEffect(() => {
+    void fetchCategories().then((res) => {
+      if (res.success) setCategories(res.data.categories.filter((c) => c.active))
+    })
   }, [])
 
   useEffect(() => {
@@ -61,22 +72,33 @@ export function ProductPanel({ onNotify }: Props) {
     setTotalPages(null)
     appendedPagesRef.current = {}
     setScrollTop(0)
-  }, [search])
+  }, [search, categoryId, refreshKey])
 
   useEffect(() => {
     void loadPage(page)
-  }, [page, search])
+  }, [page, search, categoryId, refreshKey])
 
   async function loadPage(pageNum: number) {
     if (pageNum === 1) setLoading(true)
     else setFetching(true)
 
-    const res = await fetchProductsPage({ search, page: pageNum, limit: PAGE_LIMIT, active: true })
+    const res = await fetchProductsPage({
+      search,
+      categoryId: categoryId ?? undefined,
+      page: pageNum,
+      limit: PAGE_LIMIT,
+      active: true,
+    })
     if (res.success) {
       setTotalPages(res.data.pagination.totalPages)
+      const batch = res.data.products
       if (!appendedPagesRef.current[pageNum]) {
         appendedPagesRef.current[pageNum] = true
-        setProducts((prev) => (pageNum === 1 ? res.data.products : [...prev, ...res.data.products]))
+        setProducts((prev) => (pageNum === 1 ? batch : [...prev, ...batch]))
+      }
+      if (pageNum === 1) {
+        const stockMap = Object.fromEntries(batch.map((p) => [p.id, p.stockQuantity]))
+        cartStore.syncProductStocks(stockMap)
       }
     }
 
@@ -90,10 +112,15 @@ export function ProductPanel({ onNotify }: Props) {
     const match = products.find((p) => p.barcode === scanPendingCode || p.sku === scanPendingCode)
     if (match) {
       if (match.stockQuantity > 0) {
-        cartStore.addItem(toCartProduct(match), 1)
-        setSearch('')
-        setScanPendingCode(null)
-        onNotify?.({ type: 'ok', text: `${match.name} agregado al carrito` })
+        const added = cartStore.addItem(toCartProduct(match), 1)
+        if (added) {
+          setSearch('')
+          setScanPendingCode(null)
+          onNotify?.({ type: 'ok', text: `${match.name} agregado al carrito` })
+        } else {
+          onNotify?.({ type: 'error', text: `Stock máximo: ${match.stockQuantity}` })
+          setScanPendingCode(null)
+        }
       } else {
         onNotify?.({ type: 'error', text: 'El producto no tiene stock disponible' })
         setScanPendingCode(null)
@@ -175,7 +202,8 @@ export function ProductPanel({ onNotify }: Props) {
       onNotify?.({ type: 'error', text: `Stock máximo: ${product.stockQuantity}` })
       return
     }
-    cartStore.addItem(toCartProduct(product), 1)
+    const added = cartStore.addItem(toCartProduct(product), 1)
+    if (added) onNotify?.({ type: 'ok', text: `${product.name} agregado` })
   }
 
   return (
@@ -185,7 +213,7 @@ export function ProductPanel({ onNotify }: Props) {
           ref={searchInputRef}
           type="text"
           className="pos-search-input"
-          placeholder="Buscar productos o escanear código de barras…"
+          placeholder="Buscar productos o escanear código de barras… (F2)"
           value={search}
           onChange={(e) => {
             setSearch(e.target.value)
@@ -198,6 +226,32 @@ export function ProductPanel({ onNotify }: Props) {
           </p>
         )}
       </div>
+
+      {categories.length > 0 && (
+        <div className="pos-category-chips" role="tablist" aria-label="Filtrar por categoría">
+          <button
+            type="button"
+            role="tab"
+            aria-selected={categoryId === null}
+            className={`pos-category-chip${categoryId === null ? ' active' : ''}`}
+            onClick={() => setCategoryId(null)}
+          >
+            Todas
+          </button>
+          {categories.map((cat) => (
+            <button
+              key={cat.id}
+              type="button"
+              role="tab"
+              aria-selected={categoryId === cat.id}
+              className={`pos-category-chip${categoryId === cat.id ? ' active' : ''}`}
+              onClick={() => setCategoryId(cat.id)}
+            >
+              {cat.name}
+            </button>
+          ))}
+        </div>
+      )}
 
       <div
         ref={scrollRef}
@@ -219,11 +273,12 @@ export function ProductPanel({ onNotify }: Props) {
               const absoluteIndex = visibleRange.startIndex + i
               const row = Math.floor(absoluteIndex / columns)
               const col = absoluteIndex % columns
+              const lowStock = product.stockQuantity > 0 && product.stockQuantity <= 5
               return (
                 <button
                   key={product.id}
                   type="button"
-                  className="pos-product-card"
+                  className={`pos-product-card${lowStock ? ' pos-product-low-stock' : ''}`}
                   disabled={product.stockQuantity <= 0}
                   style={{
                     width: cardWidth,
@@ -234,7 +289,10 @@ export function ProductPanel({ onNotify }: Props) {
                 >
                   <strong>{product.name}</strong>
                   <span className="muted pos-product-sku">{product.sku ?? '—'}</span>
-                  <span className="muted">Stock: {product.stockQuantity}</span>
+                  <span className={`muted${lowStock ? ' pos-stock-warn' : ''}`}>
+                    Stock: {product.stockQuantity}
+                    {lowStock ? ' ⚠' : ''}
+                  </span>
                   <span className="pos-product-price">{formatCurrency(Number(product.price))}</span>
                 </button>
               )

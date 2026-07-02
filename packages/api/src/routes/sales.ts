@@ -16,6 +16,7 @@ const createSchema = z.object({
   paymentMethod: z.enum(['CASH', 'CARD', 'TRANSFER', 'OTHER']),
   discount: z.number().nonnegative().optional(),
   paidAmount: z.number().nonnegative().optional(),
+  notes: z.string().max(500).optional().nullable(),
 })
 
 export async function salesRoutes(app: FastifyInstance) {

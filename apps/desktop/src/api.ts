@@ -110,6 +110,7 @@ export async function fetchProducts(search = '') {
 
 export async function fetchProductsPage(params: {
   search?: string
+  categoryId?: string
   page?: number
   limit?: number
   active?: boolean
@@ -117,6 +118,7 @@ export async function fetchProductsPage(params: {
   const q = new URLSearchParams({ limit: String(params.limit ?? 100) })
   if (params.page) q.set('page', String(params.page))
   if (params.search) q.set('search', params.search)
+  if (params.categoryId) q.set('categoryId', params.categoryId)
   if (params.active !== undefined) q.set('active', String(params.active))
   return api<{ products: Product[]; pagination: ProductPagination }>(`/api/v1/products?${q}`)
 }
@@ -204,6 +206,19 @@ export async function createPurchase(body: {
   return api<{ purchase: unknown }>('/api/v1/purchases', { method: 'POST', body: JSON.stringify(body) })
 }
 
+export type Business = {
+  id: string
+  name: string
+  taxId: string | null
+  taxRate: string
+  address: string | null
+  phone: string | null
+}
+
+export async function fetchBusiness() {
+  return api<{ business: Business }>('/api/v1/business')
+}
+
 export type SaleItem = {
   id: string
   productId: string
@@ -220,10 +235,14 @@ export type Sale = {
   paymentMethod: 'CASH' | 'CARD' | 'TRANSFER' | 'OTHER'
   subtotal: string
   discount: string
+  tax: string
   total: string
+  paidAmount: string | null
+  change: string | null
+  notes: string | null
   createdAt: string
   user?: { id: string; name: string; email: string }
-  customer?: { id: string; name: string } | null
+  customer?: { id: string; name: string; taxId?: string | null } | null
   items?: SaleItem[]
 }
 
@@ -239,6 +258,7 @@ export async function createSale(body: {
   discount?: number
   paidAmount?: number
   customerId?: string | null
+  notes?: string | null
 }) {
   return api<{ sale: Sale }>('/api/v1/sales', { method: 'POST', body: JSON.stringify(body) })
 }

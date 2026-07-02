@@ -15,7 +15,15 @@ describe('sale totals', () => {
       100,
     )
     expect(result.subtotal).toBe(3100)
+    expect(result.tax).toBe(0)
     expect(result.total).toBe(3000)
+  })
+
+  it('computes tax on amount after discount', () => {
+    const result = computeSaleTotals([{ quantity: 1, unitPrice: 1000 }], 0, 0.21)
+    expect(result.subtotal).toBe(1000)
+    expect(result.tax).toBe(210)
+    expect(result.total).toBe(1210)
   })
 
   it('rejects discount greater than subtotal', () => {

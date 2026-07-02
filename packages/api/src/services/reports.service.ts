@@ -26,12 +26,13 @@ export async function getSalesStats(period: ReportPeriod) {
       createdAt: { gte: start, lte: end },
     },
     _count: true,
-    _sum: { total: true, discount: true },
+    _sum: { total: true, discount: true, tax: true },
   })
 
   const salesCount = agg._count
   const totalRevenue = Number(agg._sum.total ?? 0)
   const totalDiscount = Number(agg._sum.discount ?? 0)
+  const totalTax = Number(agg._sum.tax ?? 0)
   const averageSale = salesCount > 0 ? totalRevenue / salesCount : 0
 
   return {
@@ -39,7 +40,7 @@ export async function getSalesStats(period: ReportPeriod) {
     totalRevenue: dec(totalRevenue)!,
     totalDiscount: dec(totalDiscount)!,
     averageSale: dec(averageSale)!,
-    totalTax: '0',
+    totalTax: dec(totalTax)!,
   }
 }
 
