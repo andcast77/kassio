@@ -1,0 +1,17 @@
+# Solo desarrollo. En producción la app usa PostgreSQL embebido (ver docs/03-ARCHITECTURE.md).
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: kassio-postgres-dev
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: kassio
+      POSTGRES_PASSWORD: kassio
+      POSTGRES_DB: kassio_dev
+    volumes:
+      - kassio_pg_data:/var/lib/postgresql/data
+
+volumes:
+  kassio_pg_data:
