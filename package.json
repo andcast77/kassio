@@ -6,6 +6,9 @@
   "scripts": {
     "setup": "node scripts/setup.mjs",
     "dev": "pnpm run db:up && concurrently -n api,ui -c blue,green \"pnpm --filter @kassio/api dev\" \"pnpm --filter @kassio/desktop dev\"",
+    "dev:embedded": "node scripts/dev-with-embedded.mjs",
+    "dev:embedded:ui": "node scripts/dev-with-embedded.mjs",
+    "start:embedded": "node scripts/kassio-start.mjs",
     "dev:api": "pnpm --filter @kassio/api dev",
     "dev:desktop": "pnpm --filter @kassio/desktop dev",
     "db:up": "docker compose up -d postgres",
@@ -15,7 +18,8 @@
     "db:setup": "pnpm setup && pnpm db:up && pnpm db:migrate && pnpm db:seed",
     "db:studio": "pnpm --filter @kassio/database studio",
     "build": "pnpm -r run build",
-    "test": "pnpm --filter @kassio/api test",
+    "test": "pnpm --filter @kassio/api test && pnpm --filter @kassio/runtime test",
+    "test:api": "pnpm --filter @kassio/api test",
     "typecheck": "pnpm -r run typecheck"
   },
   "devDependencies": {

@@ -10,14 +10,22 @@ Proyecto independiente de [multisystem](../multisystem). Shopflow es referencia 
 
 - Node.js 20+
 - pnpm (`corepack enable`)
-- Docker (solo Postgres en **desarrollo**)
+- Docker (opcional — solo Postgres en dev clásico)
+- Rust (solo para build Tauri / instaladores)
 
 ### Primer arranque
 
 ```bash
 pnpm install
-pnpm db:setup    # crea .env + postgres + migrate + seed
+pnpm db:setup    # Docker Postgres + migrate + seed
 pnpm dev         # API :3000 + UI :5173
+```
+
+**Sin Docker** (mismo flujo que producción):
+
+```bash
+pnpm install
+pnpm dev:embedded   # Postgres embebido + API + UI
 ```
 
 Abrí http://127.0.0.1:5173
@@ -32,10 +40,13 @@ Abrí http://127.0.0.1:5173
 | Comando | Qué hace |
 |---------|----------|
 | `pnpm setup` | Copia `.env.example` → `.env` (si faltan) |
-| `pnpm dev` | API + UI |
-| `pnpm db:setup` | Setup completo de BD |
-| `pnpm test` | Tests API Fase 1 |
+| `pnpm dev` | API + UI (Docker Postgres) |
+| `pnpm dev:embedded` | API + UI + Postgres embebido |
+| `pnpm start:embedded` | Postgres embebido + API (producción-like) |
+| `pnpm db:setup` | Setup completo de BD con Docker |
+| `pnpm test` | Tests API + runtime embebido |
 | `pnpm typecheck` | TypeScript en todo el monorepo |
+| `pnpm --filter @kassio/desktop tauri:dev` | Ventana nativa Tauri (requiere Rust) |
 
 ## Documentación
 
@@ -46,17 +57,19 @@ Abrí http://127.0.0.1:5173
 | [docs/03-ARCHITECTURE.md](./docs/03-ARCHITECTURE.md) | Arquitectura + Postgres embebido |
 | [docs/04-DATA-MODEL.md](./docs/04-DATA-MODEL.md) | Modelo de datos |
 | [docs/05-ROADMAP.md](./docs/05-ROADMAP.md) | Roadmap |
+| [docs/08-QA-CHECKLIST.md](./docs/08-QA-CHECKLIST.md) | Checklist QA manual |
 
 ## Estructura
 
 ```
 kassio/
-├── apps/desktop/       ← UI React + Vite
-├── packages/api/       ← Fastify
-├── packages/database/  ← Prisma
+├── apps/desktop/         ← UI React + Vite + Tauri
+├── packages/api/         ← Fastify
+├── packages/database/    ← Prisma
+├── packages/runtime/     ← Postgres embebido + bootstrap
 └── docs/
 ```
 
 ## Estado
 
-**Fase 1 completa** — login, apertura/cierre de caja (API + UI + tests). Siguiente: Fase 2 (catálogo y compras).
+**Fases 0–5 completas** — POS offline, catálogo, compras, ventas, runtime embebido, Tauri scaffold, tests.

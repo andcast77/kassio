@@ -1,6 +1,7 @@
 import { CashSessionStatus, prisma, SaleStatus, StockMovementType, type PaymentMethod } from '@kassio/database'
 import { AppError } from '../lib/errors.js'
 import { dec } from '../lib/decimal.js'
+import { computeSaleTotals, validateCashPayment } from '../lib/sale-totals.js'
 
 function serializeSale(sale: {
   id: string
@@ -15,7 +16,7 @@ function serializeSale(sale: {
   total: { toString(): string }
   createdAt: Date
   user?: { id: string; name: string; email: string }
-  customer?: { id: string; name: string; email: string | null; phone: string | null } | null
+  customer?: { id: string; name: string; email?: string | null; phone?: string | null } | null
   items?: Array<{
     id: string
     productId: string
@@ -103,14 +104,17 @@ export async function createSale(
     })
   }
 
-  const subtotal = lineItems.reduce((sum, item) => sum + item.lineTotal, 0)
-  const discount = data.discount ?? 0
-  if (discount < 0 || discount > subtotal) {
+  let totals
+  try {
+    totals = computeSaleTotals(
+      lineItems.map(({ quantity, unitPrice }) => ({ quantity, unitPrice })),
+      data.discount ?? 0,
+    )
+  } catch {
     throw new AppError(400, 'Descuento inválido', 'VALIDATION_ERROR')
   }
-  const total = subtotal - discount
 
-  if (data.paymentMethod === 'CASH' && data.paidAmount != null && data.paidAmount < total) {
+  if (data.paymentMethod === 'CASH' && data.paidAmount != null && !validateCashPayment(data.paidAmount, totals.total)) {
     throw new AppError(400, 'El monto pagado es menor que el total', 'VALIDATION_ERROR')
   }
 
@@ -132,9 +136,9 @@ export async function createSale(
         cashSessionId: cashSession.id,
         customerId: data.customerId ?? null,
         paymentMethod: data.paymentMethod,
-        subtotal,
-        discount,
-        total,
+        subtotal: totals.subtotal,
+        discount: totals.discount,
+        total: totals.total,
         status: SaleStatus.COMPLETED,
         items: {
           create: lineItems.map((item) => ({

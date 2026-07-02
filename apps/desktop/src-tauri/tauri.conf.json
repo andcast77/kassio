@@ -1,0 +1,33 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Kassio",
+  "version": "0.1.0",
+  "identifier": "app.kassio.desktop",
+  "build": {
+    "beforeDevCommand": "pnpm --dir ../.. dev:embedded:ui",
+    "devUrl": "http://127.0.0.1:5173",
+    "beforeBuildCommand": "pnpm build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "Kassio",
+        "width": 1360,
+        "height": 768,
+        "minWidth": 1280,
+        "minHeight": 720,
+        "resizable": true,
+        "center": true
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["deb", "appimage", "msi", "nsis"],
+    "icon": []
+  }
+}

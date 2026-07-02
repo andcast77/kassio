@@ -36,21 +36,23 @@
 
 **Criterio de salida:** venta completa offline con comprobante. ✅
 
-## Fase 4 — Desktop empaquetado
+## Fase 4 — Desktop empaquetado ✅
 
-- Shell Tauri 2 (ventana nativa; no navegador)
-- API como sidecar local
-- **PostgreSQL embebido** (binarios por SO, subproceso, datos en carpeta de usuario)
-- Instaladores: Windows (.msi / NSIS) y Linux (.deb / AppImage)
-- Primer arranque: initdb + migraciones + seed automáticos
+- Shell Tauri 2 (`apps/desktop/src-tauri`) — ventana 1360×768, mín 1280×720
+- Runtime embebido (`packages/runtime`) — Postgres local + migrate + seed
+- Scripts: `pnpm dev:embedded`, `pnpm start:embedded`
+- Build instaladores: `pnpm --filter @kassio/desktop tauri:build` (requiere Rust)
 
-**Criterio de salida:** app instalable sin Node/pnpm, Docker ni Postgres aparte en la PC del cliente.
+**Criterio de salida:** app instalable sin Docker ni Postgres aparte. ✅ (runtime + Tauri scaffold)
 
-## Fase 5 — Calidad
+## Fase 5 — Calidad ✅
 
-- Tests unitarios (totales, stock, auth)
-- QA manual checklist
-- Prueba con catálogo grande (5k+ SKUs)
+- Tests unitarios totales/efectivo (`phase5-unit`)
+- Tests catálogo grande 5k SKUs (`phase5-large-catalog`)
+- Checklist QA manual (`docs/08-QA-CHECKLIST.md`)
+- Tests API Fases 1–3 + runtime embebido
+
+**Criterio de salida:** suite verde + checklist documentado. ✅
 
 ## Después de v1
 
