@@ -14,6 +14,7 @@ import { PurchasesPage } from './pages/PurchasesPage'
 import { PosPage } from './pages/PosPage'
 import { SalesHistoryPage } from './pages/SalesHistoryPage'
 import { DashboardPage } from './pages/DashboardPage'
+import { CustomersPage } from './pages/CustomersPage'
 
 export function App() {
   const [user, setUser] = useState<AuthUser | null>(() => getStoredUser())
@@ -73,6 +74,7 @@ export function App() {
       {page === 'ventas' && <SalesHistoryPage />}
       {page === 'productos' && <ProductsPage />}
       {page === 'categorias' && <CategoriesPage />}
+      {page === 'clientes' && <CustomersPage />}
       {page === 'compras' && <PurchasesPage />}
     </AppShell>
   )

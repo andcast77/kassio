@@ -85,6 +85,14 @@ export type Customer = {
   name: string
   email: string | null
   phone: string | null
+  taxId: string | null
+  address: string | null
+  city: string | null
+  state: string | null
+  postalCode: string | null
+  country: string | null
+  createdAt?: string
+  updatedAt?: string
 }
 
 export type ProductPagination = {
@@ -117,6 +125,51 @@ export async function fetchCustomers(search = '') {
   const q = new URLSearchParams({ limit: '100' })
   if (search) q.set('search', search)
   return api<{ customers: Customer[]; pagination: ProductPagination }>(`/api/v1/customers?${q}`)
+}
+
+export async function fetchCustomersPage(params: { search?: string; page?: number; limit?: number }) {
+  const q = new URLSearchParams({ limit: String(params.limit ?? 20) })
+  if (params.page) q.set('page', String(params.page))
+  if (params.search) q.set('search', params.search)
+  return api<{ customers: Customer[]; pagination: ProductPagination }>(`/api/v1/customers?${q}`)
+}
+
+export async function createCustomer(body: {
+  name: string
+  email?: string | null
+  phone?: string | null
+  taxId?: string | null
+  address?: string | null
+  city?: string | null
+  state?: string | null
+  postalCode?: string | null
+  country?: string | null
+}) {
+  return api<{ customer: Customer }>('/api/v1/customers', { method: 'POST', body: JSON.stringify(body) })
+}
+
+export async function updateCustomer(
+  id: string,
+  body: Partial<{
+    name: string
+    email: string | null
+    phone: string | null
+    taxId: string | null
+    address: string | null
+    city: string | null
+    state: string | null
+    postalCode: string | null
+    country: string | null
+  }>,
+) {
+  return api<{ customer: Customer }>(`/api/v1/customers/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify(body),
+  })
+}
+
+export async function deleteCustomer(id: string) {
+  return api<null>(`/api/v1/customers/${id}`, { method: 'DELETE' })
 }
 
 export async function createProduct(body: Record<string, unknown>) {

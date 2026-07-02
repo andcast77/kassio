@@ -84,6 +84,24 @@ textarea {
   gap: 0.75rem;
 }
 
+.form-grid-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.crud-toolbar {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-end;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
 .form-actions {
   display: flex;
   align-items: flex-end;
@@ -203,6 +221,45 @@ button.ghost {
   color: #c7d4ea;
 }
 
+button:focus,
+button:focus-visible,
+input:focus,
+input:focus-visible,
+textarea:focus,
+textarea:focus-visible,
+select:focus,
+select:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+input:focus,
+input:focus-visible,
+textarea:focus,
+textarea:focus-visible,
+select:focus,
+select:focus-visible,
+button.ghost:focus,
+button.ghost:focus-visible {
+  border-color: #2a3a57;
+}
+
+.sidebar-link:focus,
+.sidebar-link:focus-visible {
+  outline: none;
+  border: none;
+}
+
+.sidebar-link:focus:not(.sidebar-link-active),
+.sidebar-link:focus-visible:not(.sidebar-link-active) {
+  box-shadow: none;
+}
+
+.sidebar-link-active:focus,
+.sidebar-link-active:focus-visible {
+  box-shadow: inset 3px 0 0 #355cff;
+}
+
 h1,
 h2 {
   margin: 0 0 0.75rem;
@@ -237,7 +294,8 @@ h2 {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  min-height: calc(100vh - 120px);
+  height: 100%;
+  min-height: 0;
 }
 
 .pos-grid {
@@ -246,7 +304,7 @@ h2 {
   gap: 1rem;
   flex: 1;
   min-height: 0;
-  height: calc(100vh - 140px);
+  height: 100%;
 }
 
 .pos-panel-left {
@@ -349,10 +407,121 @@ h2 {
 
 .pos-customer {
   padding: 0.75rem 1rem;
+  position: relative;
+  z-index: 5;
 }
 
-.pos-customer label {
+.pos-customer-label {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 0.95rem;
+}
+
+.pos-customer-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: stretch;
+}
+
+.pos-customer-autocomplete {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.pos-customer-input {
+  width: 100%;
+}
+
+.pos-customer-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 50;
   margin: 0;
+  padding: 0.25rem 0;
+  list-style: none;
+  max-height: 220px;
+  overflow-y: auto;
+  background: #121a2b;
+  border: 1px solid #2a3a57;
+  border-radius: 10px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+}
+
+.pos-customer-option {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.1rem;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0.55rem 0.75rem;
+  color: inherit;
+  cursor: pointer;
+}
+
+.pos-customer-option:hover {
+  background: #1a2844;
+}
+
+.pos-customer-option strong {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.pos-customer-option .muted {
+  font-size: 0.78rem;
+}
+
+.pos-customer-hint {
+  padding: 0.55rem 0.75rem;
+  font-size: 0.85rem;
+  color: #8fa3c7;
+}
+
+.pos-customer-clear {
+  flex-shrink: 0;
+  width: 42px;
+  padding: 0.5rem;
+}
+
+.pos-customer-new {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.pos-customer-modal {
+  width: min(520px, 100%);
+  max-height: min(90vh, 720px);
+  overflow-y: auto;
+}
+
+.pos-customer-modal h2 {
+  margin-top: 0;
+}
+
+.customer-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.customer-form-compact label {
+  font-size: 0.9rem;
+}
+
+.customer-form-span-2 {
+  grid-column: span 2;
+}
+
+.table-sub {
+  font-size: 0.82rem;
+  margin-top: 0.15rem;
 }
 
 .pos-cart {
@@ -618,18 +787,27 @@ h2 {
 /* App shell + sidebar (Shopflow slice 1) */
 .app-layout {
   display: flex;
-  min-height: 100vh;
   min-width: 1280px;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
 }
 
 .sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 40;
   width: 260px;
+  height: 100vh;
+  height: 100dvh;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
   background: #0d1424;
   border-right: 1px solid #22304a;
   padding: 1.25rem 1rem;
+  overflow: hidden;
 }
 
 .sidebar-brand {
@@ -654,6 +832,7 @@ h2 {
 
 .sidebar-nav {
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
 }
 
@@ -699,6 +878,7 @@ h2 {
 }
 
 .sidebar-footer {
+  flex-shrink: 0;
   border-top: 1px solid #22304a;
   padding-top: 1rem;
   display: flex;
@@ -715,9 +895,15 @@ h2 {
   display: flex;
   flex-direction: column;
   min-width: 0;
+  min-height: 0;
+  height: 100vh;
+  height: 100dvh;
+  margin-left: 260px;
+  overflow: hidden;
 }
 
 .app-main-header {
+  flex-shrink: 0;
   padding: 1.25rem 1.5rem 0;
 }
 
@@ -728,6 +914,7 @@ h2 {
 
 .app-main-content {
   flex: 1;
+  min-height: 0;
   padding: 1rem 1.5rem 1.5rem;
   overflow-y: auto;
 }

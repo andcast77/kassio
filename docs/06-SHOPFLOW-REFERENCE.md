@@ -166,6 +166,18 @@ Próximos slices: listado/form productos, ajustes inventario, fidelizar dashboar
 
 ---
 
+## UI slice 3 — Customers (SDD: `shopflow-ui-slice-3`)
+
+| Shopflow | Kassio (slice 3) |
+|----------|------------------|
+| `CustomerList` + búsqueda/paginación | `CustomersPage.tsx` |
+| `CustomerForm` | Formulario crear/editar en la misma página |
+| CRUD API | Ya existía; tests en `customers.test.ts` |
+
+Campos: nombre, email, teléfono, dirección (sin city/state — schema Kassio).
+
+---
+
 ## Qué NO copiar
 
 | Shopflow | Motivo |

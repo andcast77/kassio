@@ -90,14 +90,19 @@ model Product {
 }
 
 model Customer {
-  id        String   @id @default(cuid())
-  name      String
-  email     String?
-  phone     String?
-  address   String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  sales     Sale[]
+  id         String   @id @default(cuid())
+  name       String
+  email      String?
+  phone      String?
+  taxId      String?
+  address    String?
+  city       String?
+  state      String?
+  postalCode String?
+  country    String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  sales      Sale[]
 }
 
 model Supplier {

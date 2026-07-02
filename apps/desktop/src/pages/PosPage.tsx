@@ -74,7 +74,7 @@ export function PosPage() {
         </section>
 
         <div className="pos-panel-right">
-          <CustomerSelector />
+          <CustomerSelector onNotify={handleNotify} />
           <ShoppingCart />
           <TotalsPanel onCheckout={handleCheckout} taxRate={0} />
         </div>

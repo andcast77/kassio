@@ -6,6 +6,7 @@ export type AppPage =
   | 'productos'
   | 'categorias'
   | 'compras'
+  | 'clientes'
 
 export type NavItem = { id: AppPage; label: string }
 export type NavGroup = { title: string; items: NavItem[] }
@@ -24,6 +25,7 @@ export const NAV_GROUPS: NavGroup[] = [
     items: [
       { id: 'productos', label: 'Productos' },
       { id: 'categorias', label: 'Categorías' },
+      { id: 'clientes', label: 'Clientes' },
       { id: 'compras', label: 'Compras' },
       { id: 'ventas', label: 'Ventas' },
     ],

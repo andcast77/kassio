@@ -8,7 +8,12 @@ const bodySchema = z.object({
   name: z.string().min(1),
   email: z.string().email().optional().nullable().or(z.literal('')),
   phone: z.string().optional().nullable(),
+  taxId: z.string().optional().nullable(),
   address: z.string().optional().nullable(),
+  city: z.string().optional().nullable(),
+  state: z.string().optional().nullable(),
+  postalCode: z.string().optional().nullable(),
+  country: z.string().optional().nullable(),
 })
 
 const updateSchema = bodySchema.partial()
