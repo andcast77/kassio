@@ -4,6 +4,7 @@
   "private": true,
   "packageManager": "pnpm@9.15.0",
   "scripts": {
+    "setup": "node scripts/setup.mjs",
     "dev": "pnpm run db:up && concurrently -n api,ui -c blue,green \"pnpm --filter @kassio/api dev\" \"pnpm --filter @kassio/desktop dev\"",
     "dev:api": "pnpm --filter @kassio/api dev",
     "dev:desktop": "pnpm --filter @kassio/desktop dev",
@@ -11,9 +12,10 @@
     "db:down": "docker compose down",
     "db:migrate": "pnpm --filter @kassio/database migrate:dev",
     "db:seed": "pnpm --filter @kassio/database db:seed",
-    "db:setup": "pnpm db:up && pnpm db:migrate && pnpm db:seed",
+    "db:setup": "pnpm setup && pnpm db:up && pnpm db:migrate && pnpm db:seed",
     "db:studio": "pnpm --filter @kassio/database studio",
     "build": "pnpm -r run build",
+    "test": "pnpm --filter @kassio/api test",
     "typecheck": "pnpm -r run typecheck"
   },
   "devDependencies": {

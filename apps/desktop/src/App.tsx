@@ -17,8 +17,8 @@ export function App() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const [email, setEmail] = useState('admin@kassio.local')
-  const [password, setPassword] = useState('Admin123!')
+  const [email, setEmail] = useState('cajero@kassio.local')
+  const [password, setPassword] = useState('Cajero123!')
   const [openingFloat, setOpeningFloat] = useState('0')
   const [countedCash, setCountedCash] = useState('0')
   const [closeNotes, setCloseNotes] = useState('')

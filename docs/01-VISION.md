@@ -6,7 +6,7 @@ Multisystem **Shopflow** es una aplicación web modular en la nube: hub, inventa
 
 ## Solución
 
-Un **POS local**: una aplicación de escritorio enfocada en vender en el mostrador, con todos los datos en la PC del negocio.
+Un **POS local** llamado **Kassio**: aplicación de escritorio enfocada en vender en el mostrador, con todos los datos en la PC del negocio.
 
 ## Usuario objetivo
 

@@ -6,15 +6,16 @@
 - Referencia Shopflow
 - **Sin código**
 
-## Fase 1 — Fundación
+## Fase 1 — Fundación ✅
 
-- Inicializar repo git + monorepo mínimo
-- PostgreSQL + Prisma + migración inicial
-- Seed: negocio, admin, productos demo
-- Login / logout
-- Apertura y cierre de caja (API)
+- Repo git + monorepo pnpm (`apps/desktop`, `packages/api`, `packages/database`)
+- PostgreSQL (dev: Docker) + Prisma + migración inicial
+- Seed: negocio, admin, cajero, productos demo
+- Login / logout (API + UI)
+- Apertura y cierre de caja (API + UI)
+- Tests API Fase 1 (auth + caja)
 
-**Criterio de salida:** cajero entra, abre caja.
+**Criterio de salida:** cajero entra, abre caja. ✅
 
 ## Fase 2 — Catálogo y compras
 

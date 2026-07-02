@@ -10,6 +10,8 @@ config({ path: resolve(__dirname, '../.env') })
 
 const ADMIN_EMAIL = 'admin@kassio.local'
 const ADMIN_PASSWORD = 'Admin123!'
+const CASHIER_EMAIL = 'cajero@kassio.local'
+const CASHIER_PASSWORD = 'Cajero123!'
 
 async function main() {
   const business = await prisma.business.upsert({
@@ -34,6 +36,18 @@ async function main() {
       passwordHash,
       name: 'Administrador',
       role: UserRole.ADMIN,
+    },
+  })
+
+  const cashierHash = await bcrypt.hash(CASHIER_PASSWORD, 10)
+  const cashier = await prisma.user.upsert({
+    where: { email: CASHIER_EMAIL },
+    update: { passwordHash: cashierHash, name: 'Cajero Demo', role: UserRole.CASHIER, active: true },
+    create: {
+      email: CASHIER_EMAIL,
+      passwordHash: cashierHash,
+      name: 'Cajero Demo',
+      role: UserRole.CASHIER,
     },
   })
 
@@ -80,6 +94,7 @@ async function main() {
   console.log('Seed OK')
   console.log(`  Business: ${business.name}`)
   console.log(`  Admin:    ${admin.email} / ${ADMIN_PASSWORD}`)
+  console.log(`  Cajero:   ${cashier.email} / ${CASHIER_PASSWORD}`)
 }
 
 main()

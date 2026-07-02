@@ -78,8 +78,8 @@ HTTP → Controller → Service → Repository → Prisma
 
 | SO | Ruta |
 |----|------|
-| Windows | `%LOCALAPPDATA%\POS Local\data\` |
-| Linux | `~/.local/share/pos-local/data/` |
+| Windows | `%LOCALAPPDATA%\Kassio\data\` |
+| Linux | `~/.local/share/kassio/data/` |
 
 El cluster (`PGDATA`), logs y backups viven ahí. Desinstalar la app puede ofrecer conservar o borrar esa carpeta.
 
@@ -100,12 +100,11 @@ Instalador (.exe/.msi o .deb/AppImage)
 ### Contenido del paquete (producción)
 
 ```
-POS Local/
-├── pos-local.exe / pos-local          ← ventana Tauri (UI)
-├── api-server                         ← API Fastify (binario sidecar)
-├── resources/ui/                      ← build estático React
-└── resources/postgres/                ← binarios del motor (por SO)
-      initdb, pg_ctl, postgres, …
+Kassio/
+├── kassio.exe / kassio            ← ventana Tauri (UI)
+├── api-server                     ← API Fastify (binario sidecar)
+├── resources/ui/                  ← build estático React
+└── resources/postgres/            ← binarios del motor (por SO)
 ```
 
 CI genera builds separados; la lógica de arranque y rutas de datos es la misma.
@@ -114,7 +113,7 @@ CI genera builds separados; la lógica de arranque y rutas de datos es la misma.
 
 | Enfoque | Cuándo |
 |---------|--------|
-| **Postgres embebido (recomendado)** | Mismo código de arranque que producción; datos en `~/.local/share/pos-local/data/` |
+| **Postgres embebido (recomendado)** | Mismo código de arranque que producción; datos en `~/.local/share/kassio/data/` |
 | Postgres del sistema | Opcional, solo comodidad del desarrollador; no es el contrato de producto |
 
 Docker **no** es requisito ni para dev ni para el comercio.
@@ -135,14 +134,12 @@ Todas las operaciones core leen/escriben PostgreSQL local. No hay llamadas HTTP 
 |----|-----|
 | HTML + `window.print()` | ESC/POS vía plugin Tauri o spooler Windows |
 
-## Estructura de repo (cuando se implemente)
+## Estructura de repo
 
 ```
-pos-local/
-├── docs/           ← este set de documentos
-├── apps/desktop/   ← UI
-├── packages/api/
-└── packages/database/
+kassio/
+├── docs/
+├── apps/desktop/   ← UI React + Vite
+├── packages/api/   ← Fastify
+└── packages/database/ ← Prisma
 ```
-
-Repo git y código: **pendiente de aprobación explícita**.

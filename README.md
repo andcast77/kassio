@@ -4,37 +4,38 @@ Punto de venta **offline** para Windows y Linux: PostgreSQL embebido en producci
 
 Proyecto independiente de [multisystem](../multisystem). Shopflow es referencia de UX, no dependencia.
 
-## Desarrollo (Fase 1)
+## Desarrollo
 
 ### Requisitos
 
 - Node.js 20+
 - pnpm (`corepack enable`)
-- Docker (solo para Postgres en **desarrollo**; en producción la app trae Postgres embebido)
+- Docker (solo Postgres en **desarrollo**)
 
 ### Primer arranque
 
 ```bash
 pnpm install
-cp .env.example .env
-cp .env.example packages/api/.env
-cp .env.example packages/database/.env
-pnpm db:setup    # docker postgres + migrate + seed
+pnpm db:setup    # crea .env + postgres + migrate + seed
 pnpm dev         # API :3000 + UI :5173
 ```
 
 Abrí http://127.0.0.1:5173
 
-**Admin de desarrollo:** `admin@kassio.local` / `Admin123!`
+| Usuario | Correo | Contraseña |
+|---------|--------|------------|
+| Admin | `admin@kassio.local` | `Admin123!` |
+| Cajero | `cajero@kassio.local` | `Cajero123!` |
 
 ### Scripts
 
 | Comando | Qué hace |
 |---------|----------|
-| `pnpm dev` | API + UI (levanta Postgres dev si hace falta) |
-| `pnpm db:setup` | Postgres docker + migraciones + seed |
-| `pnpm db:migrate` | Nueva migración Prisma |
-| `pnpm db:studio` | Prisma Studio |
+| `pnpm setup` | Copia `.env.example` → `.env` (si faltan) |
+| `pnpm dev` | API + UI |
+| `pnpm db:setup` | Setup completo de BD |
+| `pnpm test` | Tests API Fase 1 |
+| `pnpm typecheck` | TypeScript en todo el monorepo |
 
 ## Documentación
 
@@ -56,15 +57,6 @@ kassio/
 └── docs/
 ```
 
-## Decisiones
-
-| Tema | Decisión |
-|------|----------|
-| Producto | **Kassio** (`kassio.app` libre) |
-| BD producción | PostgreSQL embebido en el instalador |
-| BD desarrollo | Docker Compose (temporal) |
-| Monorepo | pnpm workspaces |
-
 ## Estado
 
-**Fase 1 en progreso:** login, apertura/cierre de caja (API + UI).
+**Fase 1 completa** — login, apertura/cierre de caja (API + UI + tests). Siguiente: Fase 2 (catálogo y compras).
