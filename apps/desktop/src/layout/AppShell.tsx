@@ -1,7 +1,9 @@
 import type { ReactNode } from 'react'
 import type { AuthUser } from '../api'
+import { Sidebar } from './Sidebar'
+import { pageTitle, type AppPage } from './routes'
 
-export type AppPage = 'caja' | 'vender' | 'ventas' | 'productos' | 'categorias' | 'compras'
+export type { AppPage } from './routes'
 
 type Props = {
   user: AuthUser
@@ -11,46 +13,16 @@ type Props = {
   children: ReactNode
 }
 
-const NAV: { id: AppPage; label: string }[] = [
-  { id: 'caja', label: 'Caja' },
-  { id: 'vender', label: 'Vender' },
-  { id: 'ventas', label: 'Ventas' },
-  { id: 'productos', label: 'Productos' },
-  { id: 'categorias', label: 'Categorías' },
-  { id: 'compras', label: 'Compras' },
-]
-
 export function AppShell({ user, page, onNavigate, onLogout, children }: Props) {
   return (
-    <div className="shell">
-      <header className="shell-header">
-        <div>
-          <p className="eyebrow">Kassio</p>
-          <h1>{NAV.find((n) => n.id === page)?.label ?? 'Kassio'}</h1>
-        </div>
-        <div className="user-box">
-          <span>{user.name}</span>
-          <span className="muted">{user.email}</span>
-          <button type="button" className="ghost" onClick={onLogout}>
-            Salir
-          </button>
-        </div>
-      </header>
-
-      <nav className="shell-nav">
-        {NAV.map((item) => (
-          <button
-            key={item.id}
-            type="button"
-            className={item.id === page ? 'nav-active' : 'ghost'}
-            onClick={() => onNavigate(item.id)}
-          >
-            {item.label}
-          </button>
-        ))}
-      </nav>
-
-      <main className="shell-main">{children}</main>
+    <div className="app-layout">
+      <Sidebar page={page} user={user} onNavigate={onNavigate} onLogout={onLogout} />
+      <div className="app-main">
+        <header className="app-main-header">
+          <h1>{pageTitle(page)}</h1>
+        </header>
+        <main className="app-main-content">{children}</main>
+      </div>
     </div>
   )
 }

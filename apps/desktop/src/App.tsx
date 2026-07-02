@@ -13,10 +13,11 @@ import { CategoriesPage } from './pages/CategoriesPage'
 import { PurchasesPage } from './pages/PurchasesPage'
 import { PosPage } from './pages/PosPage'
 import { SalesHistoryPage } from './pages/SalesHistoryPage'
+import { DashboardPage } from './pages/DashboardPage'
 
 export function App() {
   const [user, setUser] = useState<AuthUser | null>(() => getStoredUser())
-  const [page, setPage] = useState<AppPage>('caja')
+  const [page, setPage] = useState<AppPage>('dashboard')
   const [email, setEmail] = useState('cajero@kassio.local')
   const [password, setPassword] = useState('Cajero123!')
   const [loading, setLoading] = useState(false)
@@ -66,6 +67,7 @@ export function App() {
 
   return (
     <AppShell user={user} page={page} onNavigate={setPage} onLogout={handleLogout}>
+      {page === 'dashboard' && <DashboardPage />}
       {page === 'caja' && <CashPage />}
       {page === 'vender' && <PosPage />}
       {page === 'ventas' && <SalesHistoryPage />}

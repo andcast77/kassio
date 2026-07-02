@@ -129,6 +129,43 @@ Frontend service: `lib/services/saleService.ts` + `hooks/useSales.ts`.
 
 ---
 
+## UI slice 1 — Sidebar + Dashboard (SDD: `shopflow-ui-slice-1`)
+
+Porte incremental de la **arquitectura de información** de Shopflow sin `@multisystem/ui`.
+
+| Shopflow | Kassio (slice 1) |
+|----------|------------------|
+| `Sidebar` con grupos Principal / Gestión | `apps/desktop/src/layout/Sidebar.tsx` + `routes.ts` |
+| `DashboardPage` + `StatsCards` | `DashboardPage.tsx` — tarjetas + gráfico CSS |
+| `DailySalesChart` (recharts) | Barras CSS en `.bar-chart` (sin recharts) |
+| `TopProductsTable` | Tabla en dashboard |
+| `shopflow-reports.service.ts` | `packages/api/src/services/reports.service.ts` |
+| Rutas `/reports/*` | `GET /api/v1/reports/stats|daily|top-products|inventory` |
+
+**Fuera de slice 1:** selectores empresa/tienda, loyalty, permisos granulares, recharts, pixel-perfect.
+
+---
+
+## UI slice 2 — POS screen (SDD: `shopflow-ui-slice-2`)
+
+| Shopflow | Kassio (slice 2) |
+|----------|------------------|
+| `POSPage` layout 5/12 + 7/12 | `PosPage` + `.pos-grid` |
+| `ProductPanel` virtual + barcode | `components/pos/ProductPanel.tsx` |
+| `ShoppingCart` tabular + desc. ítem % | `ShoppingCart.tsx` |
+| `TotalsPanel` desc. global % | `TotalsPanel.tsx` |
+| `PaymentModal` / `ReceiptModal` | Modales separados |
+| `CustomerSelector` | Opcional, sin loyalty |
+| `cartStore` (zustand) | `store/cartStore.ts` + `useSyncExternalStore` |
+
+**Fuera de slice 2:** loyalty, StoreSelector, IVA en total (`taxRate=0` hasta `Sale.tax`).
+
+Descuentos UI (% ítem + % global) → `discount` ($) en `createSale`.
+
+Próximos slices: listado/form productos, ajustes inventario, fidelizar dashboard.
+
+---
+
 ## Qué NO copiar
 
 | Shopflow | Motivo |

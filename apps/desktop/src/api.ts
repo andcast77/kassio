@@ -80,10 +80,43 @@ export type Category = {
 
 export type Supplier = { id: string; name: string; taxId: string | null; email: string | null; phone: string | null }
 
+export type Customer = {
+  id: string
+  name: string
+  email: string | null
+  phone: string | null
+}
+
+export type ProductPagination = {
+  page: number
+  limit: number
+  total: number
+  totalPages: number
+}
+
 export async function fetchProducts(search = '') {
   const q = new URLSearchParams({ limit: '100' })
   if (search) q.set('search', search)
-  return api<{ products: Product[]; pagination: unknown }>(`/api/v1/products?${q}`)
+  return api<{ products: Product[]; pagination: ProductPagination }>(`/api/v1/products?${q}`)
+}
+
+export async function fetchProductsPage(params: {
+  search?: string
+  page?: number
+  limit?: number
+  active?: boolean
+}) {
+  const q = new URLSearchParams({ limit: String(params.limit ?? 100) })
+  if (params.page) q.set('page', String(params.page))
+  if (params.search) q.set('search', params.search)
+  if (params.active !== undefined) q.set('active', String(params.active))
+  return api<{ products: Product[]; pagination: ProductPagination }>(`/api/v1/products?${q}`)
+}
+
+export async function fetchCustomers(search = '') {
+  const q = new URLSearchParams({ limit: '100' })
+  if (search) q.set('search', search)
+  return api<{ customers: Customer[]; pagination: ProductPagination }>(`/api/v1/customers?${q}`)
 }
 
 export async function createProduct(body: Record<string, unknown>) {
@@ -172,6 +205,52 @@ export async function fetchSalesToday() {
 
 export async function voidSale(id: string) {
   return api<{ sale: Sale }>(`/api/v1/sales/${id}/void`, { method: 'POST' })
+}
+
+export type ReportPeriod = 'today' | 'week' | 'month'
+
+export type SalesStats = {
+  salesCount: number
+  totalRevenue: string
+  totalDiscount: string
+  averageSale: string
+  totalTax: string
+}
+
+export type TopProduct = {
+  productId: string
+  productName: string
+  quantity: number
+  revenue: string
+  salesCount: number
+}
+
+export async function fetchReportStats(period: ReportPeriod = 'today') {
+  return api<{ stats: SalesStats }>(`/api/v1/reports/stats?period=${period}`)
+}
+
+export async function fetchReportDaily(days = 7) {
+  return api<{ daily: Array<{ date: string; sales: number; revenue: string }> }>(
+    `/api/v1/reports/daily?days=${days}`,
+  )
+}
+
+export async function fetchTopProducts(period: ReportPeriod = 'week', limit = 10) {
+  return api<{ products: TopProduct[] }>(
+    `/api/v1/reports/top-products?period=${period}&limit=${limit}`,
+  )
+}
+
+export async function fetchReportInventory() {
+  return api<{
+    inventory: {
+      totalProducts: number
+      outOfStockProducts: number
+      totalStockUnits: number
+      inventoryCostValue: string
+      inventoryRetailValue: string
+    }
+  }>('/api/v1/reports/inventory')
 }
 
 export async function login(email: string, password: string) {

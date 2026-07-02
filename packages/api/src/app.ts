@@ -10,6 +10,7 @@ import { supplierRoutes } from './routes/suppliers.js'
 import { purchaseRoutes } from './routes/purchases.js'
 import { inventoryRoutes } from './routes/inventory.js'
 import { salesRoutes } from './routes/sales.js'
+import { reportRoutes } from './routes/reports.js'
 import { ok } from './lib/response.js'
 
 export async function buildApp(options?: { logger?: boolean }): Promise<FastifyInstance> {
@@ -30,6 +31,7 @@ export async function buildApp(options?: { logger?: boolean }): Promise<FastifyI
   await app.register(purchaseRoutes, { prefix: '/api/v1/purchases' })
   await app.register(inventoryRoutes, { prefix: '/api/v1/inventory' })
   await app.register(salesRoutes, { prefix: '/api/v1/sales' })
+  await app.register(reportRoutes, { prefix: '/api/v1/reports' })
 
   return app
 }
