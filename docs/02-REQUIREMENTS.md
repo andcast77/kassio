@@ -10,8 +10,18 @@
 | Red | Sin dependencia de internet |
 | SO objetivo | Windows y Linux (instalable); desarrollo en cualquier SO |
 | BD | PostgreSQL embebido (incluido en el instalador; datos en carpeta de usuario) |
+| Pantalla | **Solo desktop** — diseño general **1360×768**; piso mínimo 1280×720 |
 
-## Requisitos funcionales
+### Resolución de diseño
+
+| | |
+|--|--|
+| **General (default)** | **1360×768** — diseñar y probar acá |
+| **Equivalente** | 1366×768 (6px de ancho, mismo layout) |
+| **Piso mínimo** | 1280×720 |
+| **Verificación extra** | 1920×1080 antes de cerrar el POS |
+
+Sin layout mobile. POS: productos + carrito en columnas fijas.
 
 ### RF-01 Autenticación
 
@@ -80,6 +90,7 @@
 | NFR-04 | Esquema PostgreSQL compatible con Neon |
 | NFR-05 | Respuesta de búsqueda de productos &lt; 200 ms con catálogo típico (&lt; 10k SKUs) |
 | NFR-06 | Instalable en Windows sin herramientas de desarrollo (meta fase 4) |
+| NFR-07 | UI solo **desktop**; diseño general **1360×768**; piso **1280×720**; sin layout mobile |
 
 ## Fuera de alcance v1
 

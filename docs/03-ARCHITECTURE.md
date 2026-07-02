@@ -34,6 +34,20 @@ En **desarrollo**, UI y API pueden correr por separado; conviene usar el mismo m
 | ORM | Prisma 7 | Migraciones; mismo camino a Neon que multisystem |
 | BD | PostgreSQL 14+ | Requisito explícito; compatible Neon |
 
+## UI desktop (decisión)
+
+Kassio es **solo aplicación de escritorio**. No hay versión web pública ni layout mobile.
+
+| Aspecto | Decisión |
+|---------|----------|
+| **Diseño general** | **1360×768** (1366×768 ≈ lo mismo) |
+| Piso mínimo | **1280×720** |
+| Chequeo opcional | **1920×1080** antes de release |
+| Responsive | No — layouts fijos |
+| Ventana Tauri | Mínimo 1280×720; **default 1360×768** |
+
+Toda pantalla se diseña y revisa en **1360×768**. POS: productos + carrito en columnas fijas.
+
 ## Capas de la API
 
 ```

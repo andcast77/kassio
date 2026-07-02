@@ -17,22 +17,24 @@
 
 **Criterio de salida:** cajero entra, abre caja. ✅
 
-## Fase 2 — Catálogo y compras
+## Fase 2 — Catálogo y compras ✅
 
-- CRUD productos, categorías, clientes, proveedores
-- Flujo de compra + incremento de stock
-- Ajustes de inventario + log de movimientos
+- CRUD productos, categorías, clientes, proveedores (API)
+- Flujo de compra + incremento de stock + `StockMovement`
+- Ajustes de inventario (API)
+- UI desktop: shell 1360px, Caja, Productos, Categorías, Compras
+- Tests API Fase 2 (catálogo + compra)
 
-**Criterio de salida:** admin carga mercadería; stock visible en catálogo.
+**Criterio de salida:** admin carga mercadería; stock visible en catálogo. ✅
 
-## Fase 3 — Ventas (POS)
+## Fase 3 — Ventas (POS) ✅
 
-- Pantalla de caja (layout inspirado en Shopflow)
-- Carrito → pago → venta persistida
-- Ticket HTML
-- Historial y total del día
+- Pantalla de venta (grilla + carrito + cobro)
+- Carrito → pago → venta persistida + descuento de stock
+- Ticket HTML / imprimir
+- Historial del día + total + anulación
 
-**Criterio de salida:** venta completa offline con comprobante.
+**Criterio de salida:** venta completa offline con comprobante. ✅
 
 ## Fase 4 — Desktop empaquetado
 

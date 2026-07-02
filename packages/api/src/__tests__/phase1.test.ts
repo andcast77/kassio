@@ -31,8 +31,9 @@ describe('Phase 1 API', () => {
   })
 
   beforeEach(async () => {
-    await prisma.cashSession.deleteMany({
+    await prisma.cashSession.updateMany({
       where: { status: CashSessionStatus.OPEN },
+      data: { status: CashSessionStatus.CLOSED, closedAt: new Date(), countedCash: 0 },
     })
   })
 
