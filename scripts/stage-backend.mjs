@@ -27,8 +27,13 @@ function detectTarget() {
   return process.platform === 'win32' ? 'windows' : 'linux'
 }
 
-function run(cmd, args, cwd = repoRoot) {
-  const r = spawnSync(cmd, args, { cwd, stdio: 'inherit', shell: process.platform === 'win32' })
+function run(cmd, args, cwd = repoRoot, extraEnv = {}) {
+  const r = spawnSync(cmd, args, {
+    cwd,
+    stdio: 'inherit',
+    shell: process.platform === 'win32',
+    env: { ...process.env, ...extraEnv },
+  })
   if (r.status !== 0) process.exit(r.status ?? 1)
 }
 
@@ -69,14 +74,17 @@ async function stageNode(target) {
   }
 }
 
-async function stageBackend() {
+async function stageBackend(target) {
   rmSync(backendRoot, { recursive: true, force: true })
   mkdirSync(backendRoot, { recursive: true })
 
   run('pnpm', ['--filter', '@kassio/database', 'build'])
   run('pnpm', ['--filter', '@kassio/runtime', 'build'])
   run('pnpm', ['--filter', '@kassio/api', 'build'])
-  run('pnpm', ['--filter', '@kassio/bundle', 'deploy', backendRoot, '--prod'])
+
+  // Hoisted node_modules avoids NSIS MAX_PATH failures on Windows CI (deep .pnpm paths).
+  const deployEnv = target === 'windows' ? { npm_config_node_linker: 'hoisted' } : {}
+  run('pnpm', ['--filter', '@kassio/bundle', 'deploy', backendRoot, '--prod'], repoRoot, deployEnv)
 
   const prismaSrc = join(repoRoot, 'packages/database/prisma')
   cpSync(prismaSrc, join(backendRoot, 'prisma'), { recursive: true })
@@ -100,7 +108,7 @@ function stageInstallHelpers() {
 
 const target = detectTarget()
 console.log(`[stage-backend] target=${target}`)
-await stageBackend()
+await stageBackend(target)
 await stageNode(target)
 stageInstallHelpers()
 console.log(`[stage-backend] ready: ${resourcesRoot}`)
