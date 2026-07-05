@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE "Product" ADD COLUMN "taxRate" DECIMAL(5,4) NOT NULL DEFAULT 0.21;
+
+-- AlterTable
+ALTER TABLE "SaleItem" ADD COLUMN "taxRate" DECIMAL(5,4) NOT NULL DEFAULT 0;

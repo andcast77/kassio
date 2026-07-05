@@ -18,7 +18,7 @@
     "db:setup": "pnpm setup && pnpm db:up && pnpm db:migrate && pnpm db:seed",
     "db:studio": "pnpm --filter @kassio/database studio",
     "build": "pnpm -r run build",
-    "test": "pnpm --filter @kassio/api test && pnpm --filter @kassio/runtime test",
+    "test": "pnpm --filter @kassio/api test && pnpm --filter @kassio/desktop test && pnpm --filter @kassio/runtime test",
     "test:api": "pnpm --filter @kassio/api test",
     "typecheck": "pnpm -r run typecheck"
   },

@@ -1,3 +1,5 @@
+import type { NavIconName } from './nav-icons'
+
 export type AppPage =
   | 'dashboard'
   | 'caja'
@@ -8,26 +10,26 @@ export type AppPage =
   | 'compras'
   | 'clientes'
 
-export type NavItem = { id: AppPage; label: string }
+export type NavItem = { id: AppPage; label: string; icon: NavIconName }
 export type NavGroup = { title: string; items: NavItem[] }
 
 export const NAV_GROUPS: NavGroup[] = [
   {
     title: 'Principal',
     items: [
-      { id: 'dashboard', label: 'Dashboard' },
-      { id: 'vender', label: 'Punto de Venta' },
-      { id: 'caja', label: 'Caja' },
+      { id: 'dashboard', label: 'Dashboard', icon: 'dashboard' },
+      { id: 'vender', label: 'Punto de Venta', icon: 'pos' },
+      { id: 'caja', label: 'Caja', icon: 'cash' },
     ],
   },
   {
     title: 'Gestión',
     items: [
-      { id: 'productos', label: 'Productos' },
-      { id: 'categorias', label: 'Categorías' },
-      { id: 'clientes', label: 'Clientes' },
-      { id: 'compras', label: 'Compras' },
-      { id: 'ventas', label: 'Ventas' },
+      { id: 'productos', label: 'Productos', icon: 'products' },
+      { id: 'categorias', label: 'Categorías', icon: 'categories' },
+      { id: 'clientes', label: 'Clientes', icon: 'customers' },
+      { id: 'compras', label: 'Compras', icon: 'purchases' },
+      { id: 'ventas', label: 'Ventas', icon: 'sales' },
     ],
   },
 ]

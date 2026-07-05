@@ -16,12 +16,13 @@ const CASHIER_PASSWORD = 'Cajero123!'
 async function main() {
   const business = await prisma.business.upsert({
     where: { id: 'seed-business' },
-    update: { taxRate: 0.21 },
+    update: { taxRate: 0.21, puntoVenta: 1 },
     create: {
       id: 'seed-business',
       name: 'Kassio Demo',
       taxId: '30-00000000-0',
       taxRate: 0.21,
+      puntoVenta: 1,
       address: 'Av. Demo 123',
       phone: '+54 11 0000-0000',
     },
@@ -59,9 +60,9 @@ async function main() {
   })
 
   const products = [
-    { sku: 'SKU-001', name: 'Agua 500ml', price: 800, stock: 48, barcode: '7790001000011' },
-    { sku: 'SKU-002', name: 'Gaseosa 1.5L', price: 1500, stock: 24, barcode: '7790001000028' },
-    { sku: 'SKU-003', name: 'Snack mix', price: 1200, stock: 30, barcode: '7790001000035' },
+    { sku: 'SKU-001', name: 'Agua 500ml', price: 800, stock: 48, barcode: '7790001000011', taxRate: 0.21 },
+    { sku: 'SKU-002', name: 'Gaseosa 1.5L', price: 1500, stock: 24, barcode: '7790001000028', taxRate: 0.21 },
+    { sku: 'SKU-003', name: 'Snack mix', price: 1200, stock: 30, barcode: '7790001000035', taxRate: 0.105 },
   ]
 
   for (const p of products) {
@@ -70,6 +71,7 @@ async function main() {
       update: {
         name: p.name,
         price: p.price,
+        taxRate: p.taxRate,
         stockQuantity: p.stock,
         barcode: p.barcode,
         categoryId: category.id,
@@ -79,6 +81,7 @@ async function main() {
         sku: p.sku,
         name: p.name,
         price: p.price,
+        taxRate: p.taxRate,
         stockQuantity: p.stock,
         barcode: p.barcode,
         categoryId: category.id,
@@ -90,6 +93,12 @@ async function main() {
     where: { id: 'default' },
     update: {},
     create: { id: 'default', lastNumber: 0 },
+  })
+
+  await prisma.voucherSequence.upsert({
+    where: { puntoVenta_voucherType: { puntoVenta: 1, voucherType: 11 } },
+    update: {},
+    create: { puntoVenta: 1, voucherType: 11, lastNumber: 0 },
   })
 
   console.log('Seed OK')

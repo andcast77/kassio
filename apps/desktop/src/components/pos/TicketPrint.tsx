@@ -16,6 +16,9 @@ export function TicketPrint({ sale, businessName = 'Kassio' }: Props) {
       <header className="ticket-header">
         <strong>{businessName}</strong>
         <p>Ticket #{sale.ticketNumber}</p>
+        {sale.voucherFormatted && (
+          <p className="muted">{sale.voucherTypeName} {sale.voucherFormatted}</p>
+        )}
         <p className="muted">{new Date(sale.createdAt).toLocaleString('es-AR')}</p>
         <p className="muted">Cajero: {sale.user?.name}</p>
         {sale.customer && (
@@ -115,6 +118,7 @@ export function printTicket(sale: Sale, businessName = 'Kassio') {
     </style></head><body>
     <h1>${businessName}</h1>
     <p>Ticket #${sale.ticketNumber}</p>
+    ${sale.voucherFormatted ? `<p>${sale.voucherTypeName} ${sale.voucherFormatted}</p>` : ''}
     <p>${new Date(sale.createdAt).toLocaleString('es-AR')}</p>
     ${customerBlock}
     <hr/>

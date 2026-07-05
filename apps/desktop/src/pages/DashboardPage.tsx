@@ -47,16 +47,16 @@ export function DashboardPage() {
       <div className="dashboard-toolbar">
         <h2>Dashboard</h2>
         <div className="period-tabs">
-          {(['today', 'week', 'month'] as const).map((p) => (
-            <button
-              key={p}
-              type="button"
-              className={period === p ? 'period-active' : 'ghost'}
-              onClick={() => setPeriod(p)}
-            >
-              {p === 'today' ? 'Hoy' : p === 'week' ? 'Semana' : 'Mes'}
-            </button>
-          ))}
+            {(['today', 'week', 'month'] as const).map((p) => (
+              <button
+                key={p}
+                type="button"
+                className={period === p ? 'period-active' : 'ghost'}
+                onClick={() => setPeriod(p)}
+              >
+                {p === 'today' ? 'Hoy' : p === 'week' ? 'Semana' : 'Mes'}
+              </button>
+            ))}
         </div>
       </div>
 

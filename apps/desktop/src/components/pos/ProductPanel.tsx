@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { CategoryMultiSelect } from './CategoryMultiSelect'
 import { fetchCategories, fetchProductsPage, type Category, type Product } from '../../api'
 import { useBarcodeScanner } from '../../hooks/useBarcodeScanner'
 import { cartStore, type CartProduct } from '../../store/cartStore'
 import { formatCurrency } from '../../lib/formatCurrency'
+import { productSalePrice } from '../../lib/taxPrice'
 
 type Props = {
   onNotify?: (message: { type: 'ok' | 'error'; text: string }) => void
@@ -24,12 +26,13 @@ function toCartProduct(p: Product): CartProduct {
     price: p.price,
     stockQuantity: p.stockQuantity,
     sku: p.sku,
+    taxRate: Number(p.taxRate),
   }
 }
 
 export function ProductPanel({ onNotify, refreshKey = 0, onSearchRef }: Props) {
   const [search, setSearch] = useState('')
-  const [categoryId, setCategoryId] = useState<string | null>(null)
+  const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>([])
   const [categories, setCategories] = useState<Category[]>([])
   const [scanPendingCode, setScanPendingCode] = useState<string | null>(null)
   const [page, setPage] = useState(1)
@@ -66,17 +69,19 @@ export function ProductPanel({ onNotify, refreshKey = 0, onSearchRef }: Props) {
     })
   }, [])
 
+  const categoryFilterKey = selectedCategoryIds.slice().sort().join(',')
+
   useEffect(() => {
     setPage(1)
     setProducts([])
     setTotalPages(null)
     appendedPagesRef.current = {}
     setScrollTop(0)
-  }, [search, categoryId, refreshKey])
+  }, [search, categoryFilterKey, refreshKey])
 
   useEffect(() => {
     void loadPage(page)
-  }, [page, search, categoryId, refreshKey])
+  }, [page, search, categoryFilterKey, refreshKey])
 
   async function loadPage(pageNum: number) {
     if (pageNum === 1) setLoading(true)
@@ -84,7 +89,7 @@ export function ProductPanel({ onNotify, refreshKey = 0, onSearchRef }: Props) {
 
     const res = await fetchProductsPage({
       search,
-      categoryId: categoryId ?? undefined,
+      categoryIds: selectedCategoryIds.length > 0 ? selectedCategoryIds : undefined,
       page: pageNum,
       limit: PAGE_LIMIT,
       active: true,
@@ -116,7 +121,6 @@ export function ProductPanel({ onNotify, refreshKey = 0, onSearchRef }: Props) {
         if (added) {
           setSearch('')
           setScanPendingCode(null)
-          onNotify?.({ type: 'ok', text: `${match.name} agregado al carrito` })
         } else {
           onNotify?.({ type: 'error', text: `Stock máximo: ${match.stockQuantity}` })
           setScanPendingCode(null)
@@ -202,55 +206,37 @@ export function ProductPanel({ onNotify, refreshKey = 0, onSearchRef }: Props) {
       onNotify?.({ type: 'error', text: `Stock máximo: ${product.stockQuantity}` })
       return
     }
-    const added = cartStore.addItem(toCartProduct(product), 1)
-    if (added) onNotify?.({ type: 'ok', text: `${product.name} agregado` })
+    cartStore.addItem(toCartProduct(product), 1)
   }
 
   return (
     <div className="pos-product-panel">
-      <div className="pos-search-wrap">
-        <input
-          ref={searchInputRef}
-          type="text"
-          className="pos-search-input"
-          placeholder="Buscar productos o escanear código de barras… (F2)"
-          value={search}
-          onChange={(e) => {
-            setSearch(e.target.value)
-            if (scanPendingCode && e.target.value !== scanPendingCode) setScanPendingCode(null)
-          }}
-        />
-        {scanPendingCode && (
-          <p className="pos-scan-status" role="status">
-            Buscando producto por código…
-          </p>
+      <div className="pos-search-row">
+        <div className="pos-search-wrap">
+          <input
+            ref={searchInputRef}
+            type="text"
+            className="pos-search-input"
+            placeholder="Buscar productos o escanear código de barras… (F2)"
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value)
+              if (scanPendingCode && e.target.value !== scanPendingCode) setScanPendingCode(null)
+            }}
+          />
+        </div>
+        {categories.length > 0 && (
+          <CategoryMultiSelect
+            categories={categories}
+            selectedIds={selectedCategoryIds}
+            onChange={setSelectedCategoryIds}
+          />
         )}
       </div>
-
-      {categories.length > 0 && (
-        <div className="pos-category-chips" role="tablist" aria-label="Filtrar por categoría">
-          <button
-            type="button"
-            role="tab"
-            aria-selected={categoryId === null}
-            className={`pos-category-chip${categoryId === null ? ' active' : ''}`}
-            onClick={() => setCategoryId(null)}
-          >
-            Todas
-          </button>
-          {categories.map((cat) => (
-            <button
-              key={cat.id}
-              type="button"
-              role="tab"
-              aria-selected={categoryId === cat.id}
-              className={`pos-category-chip${categoryId === cat.id ? ' active' : ''}`}
-              onClick={() => setCategoryId(cat.id)}
-            >
-              {cat.name}
-            </button>
-          ))}
-        </div>
+      {scanPendingCode && (
+        <p className="pos-scan-status" role="status">
+          Buscando producto por código…
+        </p>
       )}
 
       <div
@@ -293,7 +279,9 @@ export function ProductPanel({ onNotify, refreshKey = 0, onSearchRef }: Props) {
                     Stock: {product.stockQuantity}
                     {lowStock ? ' ⚠' : ''}
                   </span>
-                  <span className="pos-product-price">{formatCurrency(Number(product.price))}</span>
+                  <span className="pos-product-price">
+                    {formatCurrency(productSalePrice(product.price))}
+                  </span>
                 </button>
               )
             })}

@@ -10,19 +10,18 @@ const PAYMENT_METHODS: PaymentMethod[] = ['CASH', 'CARD', 'TRANSFER', 'OTHER']
 
 type Props = {
   open: boolean
-  taxRate: number
   onClose: () => void
   onSuccess: (sale: Sale) => void
   onError: (message: string) => void
 }
 
-export function PaymentModal({ open, taxRate, onClose, onSuccess, onError }: Props) {
+export function PaymentModal({ open, onClose, onSuccess, onError }: Props) {
   const items = useCartStore((s) => s.getState().items)
   const customerId = useCartStore((s) => s.getState().customerId)
-  const subtotalBeforeGlobal = useCartStore((s) => s.getSubtotalBeforeGlobal())
   const discountAmount = useCartStore((s) => s.getTotalDiscountAmount())
-  const tax = useCartStore((s) => s.getTax(taxRate))
-  const total = useCartStore((s) => s.getTotalWithTax(taxRate))
+  const netSubtotal = useCartStore((s) => s.getNetSubtotal())
+  const tax = useCartStore((s) => s.getTax())
+  const total = useCartStore((s) => s.getTotalWithTax())
 
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('CASH')
   const [paidAmount, setPaidAmount] = useState('')
@@ -59,7 +58,12 @@ export function PaymentModal({ open, taxRate, onClose, onSuccess, onError }: Pro
     const paid = paymentMethod === 'CASH' ? parseFloat(paidAmount) : total
 
     const res = await createSale({
-      items: items.map((line) => ({ productId: line.product.id, quantity: line.quantity })),
+      items: items.map((line) => ({
+        productId: line.product.id,
+        quantity: line.quantity,
+        unitPrice: line.unitPrice,
+        taxRate: line.taxRate,
+      })),
       paymentMethod,
       discount: discountAmount > 0 ? discountAmount : undefined,
       paidAmount: paymentMethod === 'CASH' ? paid : undefined,
@@ -87,8 +91,8 @@ export function PaymentModal({ open, taxRate, onClose, onSuccess, onError }: Pro
 
         <div className="pos-payment-breakdown">
           <div className="ticket-row">
-            <span>Subtotal</span>
-            <span>{formatCurrency(subtotalBeforeGlobal)}</span>
+            <span>Neto</span>
+            <span>{formatCurrency(netSubtotal)}</span>
           </div>
           {discountAmount > 0 && (
             <div className="ticket-row pos-discount-line">
@@ -96,9 +100,9 @@ export function PaymentModal({ open, taxRate, onClose, onSuccess, onError }: Pro
               <span>-{formatCurrency(discountAmount)}</span>
             </div>
           )}
-          {taxRate > 0 && (
+          {tax > 0 && (
             <div className="ticket-row">
-              <span>IVA ({taxRate * 100}%)</span>
+              <span>IVA</span>
               <span>{formatCurrency(tax)}</span>
             </div>
           )}

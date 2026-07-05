@@ -6,6 +6,7 @@ import { dec } from '../lib/decimal.js'
 export type ProductListQuery = {
   search?: string
   categoryId?: string
+  categoryIds?: string[]
   active?: boolean
   page?: number
   limit?: number
@@ -17,6 +18,7 @@ function serializeProduct(product: {
   sku: string | null
   barcode: string | null
   price: Prisma.Decimal
+  taxRate: Prisma.Decimal
   cost: Prisma.Decimal | null
   stockQuantity: number
   active: boolean
@@ -31,6 +33,7 @@ function serializeProduct(product: {
     sku: product.sku,
     barcode: product.barcode,
     price: dec(product.price)!,
+    taxRate: dec(product.taxRate)!,
     cost: dec(product.cost),
     stockQuantity: product.stockQuantity,
     active: product.active,
@@ -47,7 +50,11 @@ export async function listProducts(query: ProductListQuery) {
   const skip = (page - 1) * limit
 
   const where: Prisma.ProductWhereInput = {}
-  if (query.categoryId) where.categoryId = query.categoryId
+  if (query.categoryIds?.length) {
+    where.categoryId = { in: query.categoryIds }
+  } else if (query.categoryId) {
+    where.categoryId = query.categoryId
+  }
   if (query.active !== undefined) where.active = query.active
   if (query.search?.trim()) {
     const term = query.search.trim()
@@ -89,6 +96,7 @@ export async function createProduct(data: {
   sku?: string | null
   barcode?: string | null
   price: number
+  taxRate?: number
   cost?: number | null
   stockQuantity?: number
   categoryId?: string | null
@@ -106,6 +114,7 @@ export async function createProduct(data: {
         sku: data.sku?.trim() || null,
         barcode: data.barcode?.trim() || null,
         price: data.price,
+        taxRate: data.taxRate ?? 0.21,
         cost: data.cost ?? null,
         stockQuantity: data.stockQuantity ?? 0,
         categoryId: data.categoryId ?? null,
@@ -129,6 +138,7 @@ export async function updateProduct(
     sku: string | null
     barcode: string | null
     price: number
+    taxRate: number
     cost: number | null
     stockQuantity: number
     categoryId: string | null
@@ -150,6 +160,7 @@ export async function updateProduct(
         ...(data.sku !== undefined ? { sku: data.sku?.trim() || null } : {}),
         ...(data.barcode !== undefined ? { barcode: data.barcode?.trim() || null } : {}),
         ...(data.price !== undefined ? { price: data.price } : {}),
+        ...(data.taxRate !== undefined ? { taxRate: data.taxRate } : {}),
         ...(data.cost !== undefined ? { cost: data.cost } : {}),
         ...(data.stockQuantity !== undefined ? { stockQuantity: data.stockQuantity } : {}),
         ...(data.categoryId !== undefined ? { categoryId: data.categoryId } : {}),

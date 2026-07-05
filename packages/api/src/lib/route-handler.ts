@@ -36,3 +36,15 @@ export function parseBool(value: unknown): boolean | undefined {
   if (value === 'false') return false
   return undefined
 }
+
+export function parseStringArray(value: unknown): string[] | undefined {
+  if (typeof value === 'string') {
+    const items = value.split(',').map((s) => s.trim()).filter(Boolean)
+    return items.length > 0 ? items : undefined
+  }
+  if (Array.isArray(value)) {
+    const items = value.filter((v): v is string => typeof v === 'string' && v.length > 0)
+    return items.length > 0 ? items : undefined
+  }
+  return undefined
+}

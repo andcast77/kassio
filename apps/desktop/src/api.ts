@@ -64,6 +64,7 @@ export type Product = {
   sku: string | null
   barcode: string | null
   price: string
+  taxRate: string
   cost: string | null
   stockQuantity: number
   active: boolean
@@ -111,6 +112,7 @@ export async function fetchProducts(search = '') {
 export async function fetchProductsPage(params: {
   search?: string
   categoryId?: string
+  categoryIds?: string[]
   page?: number
   limit?: number
   active?: boolean
@@ -119,6 +121,7 @@ export async function fetchProductsPage(params: {
   if (params.page) q.set('page', String(params.page))
   if (params.search) q.set('search', params.search)
   if (params.categoryId) q.set('categoryId', params.categoryId)
+  for (const id of params.categoryIds ?? []) q.append('categoryIds', id)
   if (params.active !== undefined) q.set('active', String(params.active))
   return api<{ products: Product[]; pagination: ProductPagination }>(`/api/v1/products?${q}`)
 }
@@ -224,6 +227,7 @@ export type SaleItem = {
   productId: string
   quantity: number
   unitPrice: string
+  taxRate: string | null
   lineTotal: string
   product?: { id: string; name: string; sku: string | null }
 }
@@ -231,11 +235,19 @@ export type SaleItem = {
 export type Sale = {
   id: string
   ticketNumber: number
+  puntoVenta: number | null
+  voucherType: number | null
+  voucherNumber: number | null
+  voucherFormatted: string | null
+  voucherTypeName: string | null
+  cae: string | null
+  caeExpiresAt: string | null
   status: 'COMPLETED' | 'VOIDED' | 'REFUNDED'
   paymentMethod: 'CASH' | 'CARD' | 'TRANSFER' | 'OTHER'
   subtotal: string
   discount: string
   tax: string
+  taxRate: string | null
   total: string
   paidAmount: string | null
   change: string | null
@@ -250,12 +262,14 @@ export type TodaySummary = {
   date: string
   salesCount: number
   totalAmount: string
+  nextTicketNumber: number
 }
 
 export async function createSale(body: {
-  items: Array<{ productId: string; quantity: number }>
+  items: Array<{ productId: string; quantity: number; unitPrice?: number; taxRate?: number }>
   paymentMethod: Sale['paymentMethod']
   discount?: number
+  taxRate?: number
   paidAmount?: number
   customerId?: string | null
   notes?: string | null
@@ -274,6 +288,23 @@ export async function fetchSales(params?: { startDate?: string; endDate?: string
 
 export async function fetchSalesToday() {
   return api<{ summary: TodaySummary }>('/api/v1/sales/today')
+}
+
+export async function fetchNextTicketNumber() {
+  return api<{ ticketNumber: number }>('/api/v1/sales/next-ticket-number')
+}
+
+export type VoucherRef = {
+  puntoVenta: number
+  voucherType: number
+  voucherNumber: number
+  voucherFormatted: string
+  voucherTypeName: string
+}
+
+export async function fetchNextVoucher(customerId?: string | null) {
+  const q = customerId ? `?customerId=${encodeURIComponent(customerId)}` : ''
+  return api<{ voucher: VoucherRef }>(`/api/v1/sales/next-voucher${q}`)
 }
 
 export async function voidSale(id: string) {

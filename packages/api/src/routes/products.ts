@@ -1,7 +1,7 @@
 import type { FastifyInstance } from 'fastify'
 import { z } from 'zod'
 import { requireAuth } from '../lib/require-auth.js'
-import { handleRoute, parseBool, parsePagination } from '../lib/route-handler.js'
+import { handleRoute, parseBool, parsePagination, parseStringArray } from '../lib/route-handler.js'
 import * as products from '../services/products.service.js'
 
 const createSchema = z.object({
@@ -9,6 +9,7 @@ const createSchema = z.object({
   sku: z.string().optional().nullable(),
   barcode: z.string().optional().nullable(),
   price: z.number().positive(),
+  taxRate: z.number().min(0).max(1).optional(),
   cost: z.number().nonnegative().optional().nullable(),
   stockQuantity: z.number().int().nonnegative().optional(),
   categoryId: z.string().optional().nullable(),
@@ -27,6 +28,7 @@ export async function productRoutes(app: FastifyInstance) {
       products.listProducts({
         search: typeof q.search === 'string' ? q.search : undefined,
         categoryId: typeof q.categoryId === 'string' ? q.categoryId : undefined,
+        categoryIds: parseStringArray(q.categoryIds),
         active: parseBool(q.active),
         page,
         limit,

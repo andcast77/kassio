@@ -47,7 +47,7 @@ describe('Reports API (shopflow-ui-slice-1)', () => {
       totalRevenue: expect.any(String),
       totalDiscount: expect.any(String),
       averageSale: expect.any(String),
-      totalTax: '0',
+      totalTax: expect.any(String),
     })
 
     const daily = await app.inject({

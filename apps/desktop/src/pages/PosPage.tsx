@@ -1,19 +1,23 @@
 import { useEffect, useRef, useState } from 'react'
-import { fetchBusiness, fetchCurrentCashSession, fetchSalesToday, type CashSession, type Sale, type TodaySummary } from '../api'
+import {
+  fetchCurrentCashSession,
+  fetchSalesToday,
+  type CashSession,
+  type Sale,
+  type TodaySummary,
+} from '../api'
 import { cartStore, useCartStore } from '../store/cartStore'
-import { CustomerSelector } from '../components/pos/CustomerSelector'
+import { CheckoutStrip } from '../components/pos/CheckoutStrip'
 import { PaymentModal } from '../components/pos/PaymentModal'
 import { PosSessionBar } from '../components/pos/PosSessionBar'
 import { ProductPanel } from '../components/pos/ProductPanel'
 import { ReceiptModal } from '../components/pos/ReceiptModal'
 import { ShoppingCart } from '../components/pos/ShoppingCart'
-import { TotalsPanel } from '../components/pos/TotalsPanel'
 
 type Toast = { type: 'ok' | 'error'; text: string }
 
 export function PosPage() {
   const [loading, setLoading] = useState(true)
-  const [taxRate, setTaxRate] = useState(0)
   const [today, setToday] = useState<TodaySummary | null>(null)
   const [session, setSession] = useState<CashSession | null>(null)
   const [paymentOpen, setPaymentOpen] = useState(false)
@@ -22,6 +26,7 @@ export function PosPage() {
   const [productRefreshKey, setProductRefreshKey] = useState(0)
   const [toast, setToast] = useState<Toast | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [draftTicketNumber, setDraftTicketNumber] = useState<number | null>(null)
 
   const searchInputRef = useRef<HTMLInputElement | null>(null)
   const itemsCount = useCartStore((s) => s.getState().items.length)
@@ -42,7 +47,7 @@ export function PosPage() {
         return
       }
 
-      if (e.key === 'F4' && !paymentOpen && !receiptOpen && itemsCount > 0) {
+      if (e.key === 'F4' && !paymentOpen && !receiptOpen && itemsCount > 0 && cartStore.getTotalWithTax() > 0) {
         e.preventDefault()
         setPaymentOpen(true)
         return
@@ -64,22 +69,26 @@ export function PosPage() {
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [paymentOpen, receiptOpen, itemsCount])
 
+  async function refreshToday() {
+    const todayRes = await fetchSalesToday()
+    if (todayRes.success) {
+      setToday(todayRes.data.summary)
+      setDraftTicketNumber(todayRes.data.summary.nextTicketNumber)
+    }
+  }
+
   async function loadInitial() {
     setLoading(true)
-    const [sessionRes, businessRes, todayRes] = await Promise.all([
+    const [sessionRes, todayRes] = await Promise.all([
       fetchCurrentCashSession(),
-      fetchBusiness(),
       fetchSalesToday(),
     ])
     if (sessionRes.success) setSession(sessionRes.data.session)
-    if (businessRes.success) setTaxRate(Number(businessRes.data.business.taxRate))
-    if (todayRes.success) setToday(todayRes.data.summary)
+    if (todayRes.success) {
+      setToday(todayRes.data.summary)
+      setDraftTicketNumber(todayRes.data.summary.nextTicketNumber)
+    }
     setLoading(false)
-  }
-
-  async function refreshToday() {
-    const todayRes = await fetchSalesToday()
-    if (todayRes.success) setToday(todayRes.data.summary)
   }
 
   function handleNotify(message: Toast) {
@@ -152,9 +161,8 @@ export function PosPage() {
         </section>
 
         <div className="pos-panel-right">
-          <CustomerSelector onNotify={handleNotify} />
-          <ShoppingCart onNotify={handleNotify} />
-          <TotalsPanel onCheckout={handleCheckout} taxRate={taxRate} />
+          <ShoppingCart onNotify={handleNotify} ticketNumber={draftTicketNumber} />
+          <CheckoutStrip onCheckout={handleCheckout} />
         </div>
       </div>
 
@@ -162,7 +170,6 @@ export function PosPage() {
 
       <PaymentModal
         open={paymentOpen}
-        taxRate={taxRate}
         onClose={() => setPaymentOpen(false)}
         onSuccess={handlePaymentSuccess}
         onError={setError}

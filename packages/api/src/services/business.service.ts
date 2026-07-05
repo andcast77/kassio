@@ -7,6 +7,7 @@ function serializeBusiness(business: {
   name: string
   taxId: string | null
   taxRate: { toString(): string }
+  puntoVenta: number
   address: string | null
   phone: string | null
 }) {
@@ -15,6 +16,7 @@ function serializeBusiness(business: {
     name: business.name,
     taxId: business.taxId,
     taxRate: dec(business.taxRate)!,
+    puntoVenta: business.puntoVenta,
     address: business.address,
     phone: business.phone,
   }
@@ -32,4 +34,12 @@ export async function getBusinessTaxRate(): Promise<number> {
     select: { taxRate: true },
   })
   return business ? Number(business.taxRate) : 0
+}
+
+export async function getBusinessPuntoVenta(): Promise<number> {
+  const business = await prisma.business.findFirst({
+    orderBy: { createdAt: 'asc' },
+    select: { puntoVenta: true },
+  })
+  return business?.puntoVenta ?? 1
 }

@@ -26,12 +26,16 @@ describe('Phase 3 sales API', () => {
     })
     token = login.json().data.token
 
-    const product = await prisma.product.findFirst({ where: { active: true } })
+    const product = await prisma.product.findFirst({ where: { sku: 'SKU-001', active: true } })
     if (!product) throw new Error('No demo product in seed')
     productId = product.id
   })
 
   beforeEach(async () => {
+    await prisma.product.update({
+      where: { id: productId },
+      data: { stockQuantity: 100 },
+    })
     await prisma.cashSession.updateMany({
       where: { status: CashSessionStatus.OPEN },
       data: { status: CashSessionStatus.CLOSED, closedAt: new Date(), countedCash: 0 },
@@ -70,6 +74,7 @@ describe('Phase 3 sales API', () => {
     expect(saleRes.statusCode).toBe(201)
     const sale = saleRes.json().data.sale
     expect(sale.ticketNumber).toBeGreaterThan(0)
+    expect(sale.voucherFormatted).toBeNull()
     expect(sale.status).toBe('COMPLETED')
 
     const productAfterSale = await prisma.product.findUnique({ where: { id: productId } })

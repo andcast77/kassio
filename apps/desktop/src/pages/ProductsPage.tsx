@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { createProduct, fetchCategories, fetchProducts, type Product } from '../api'
+import { IvaPercentSpinbox } from '../components/IvaPercentSpinbox'
 
 export function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([])
@@ -9,6 +10,7 @@ export function ProductsPage() {
   const [name, setName] = useState('')
   const [sku, setSku] = useState('')
   const [price, setPrice] = useState('')
+  const [taxRate, setTaxRate] = useState(0.21)
   const [stock, setStock] = useState('0')
   const [categoryId, setCategoryId] = useState('')
 
@@ -29,6 +31,7 @@ export function ProductsPage() {
       name,
       sku: sku || null,
       price: Number(price),
+      taxRate,
       stockQuantity: Number(stock),
       categoryId: categoryId || null,
     })
@@ -39,6 +42,7 @@ export function ProductsPage() {
     setName('')
     setSku('')
     setPrice('')
+    setTaxRate(0.21)
     setStock('0')
     setCategoryId('')
     await load()
@@ -60,7 +64,11 @@ export function ProductsPage() {
         <form onSubmit={handleCreate} className="form-grid">
           <label>Nombre<input value={name} onChange={(e) => setName(e.target.value)} required /></label>
           <label>SKU<input value={sku} onChange={(e) => setSku(e.target.value)} /></label>
-          <label>Precio<input type="number" min="0" step="0.01" value={price} onChange={(e) => setPrice(e.target.value)} required /></label>
+          <label>Precio (con IVA)<input type="number" min="0" step="0.01" value={price} onChange={(e) => setPrice(e.target.value)} required /></label>
+          <label>
+            IVA (%)
+            <IvaPercentSpinbox value={taxRate} onChange={setTaxRate} />
+          </label>
           <label>Stock<input type="number" min="0" value={stock} onChange={(e) => setStock(e.target.value)} /></label>
           <label>
             Categoría
@@ -84,6 +92,7 @@ export function ProductsPage() {
               <th>Producto</th>
               <th>SKU</th>
               <th>Precio</th>
+              <th>IVA</th>
               <th>Stock</th>
               <th>Categoría</th>
             </tr>
@@ -94,6 +103,7 @@ export function ProductsPage() {
                 <td>{p.name}</td>
                 <td>{p.sku ?? '—'}</td>
                 <td>${p.price}</td>
+                <td>{Number((Number(p.taxRate) * 100).toFixed(2))}%</td>
                 <td>{p.stockQuantity}</td>
                 <td>{p.category?.name ?? '—'}</td>
               </tr>

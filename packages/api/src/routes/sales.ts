@@ -11,10 +11,13 @@ const createSchema = z.object({
     z.object({
       productId: z.string().min(1),
       quantity: z.number().int().positive(),
+      unitPrice: z.number().nonnegative().optional(),
+      taxRate: z.number().min(0).max(1).optional(),
     }),
   ).min(1),
   paymentMethod: z.enum(['CASH', 'CARD', 'TRANSFER', 'OTHER']),
   discount: z.number().nonnegative().optional(),
+  taxRate: z.number().min(0).max(1).optional(),
   paidAmount: z.number().nonnegative().optional(),
   notes: z.string().max(500).optional().nullable(),
 })
@@ -24,6 +27,19 @@ export async function salesRoutes(app: FastifyInstance) {
 
   app.get('/today', async (_request, reply) => {
     return handleRoute(reply, async () => ({ summary: await sales.getTodaySummary() }))
+  })
+
+  app.get('/next-ticket-number', async (_request, reply) => {
+    return handleRoute(reply, async () => ({
+      ticketNumber: await sales.peekNextInternalTicketNumber(),
+    }))
+  })
+
+  app.get('/next-voucher', async (request, reply) => {
+    const q = request.query as { customerId?: string }
+    return handleRoute(reply, async () => ({
+      voucher: await sales.peekPosVoucherForCustomer(q.customerId),
+    }))
   })
 
   app.get('/', async (request, reply) => {

@@ -65,7 +65,12 @@ export function SalesHistoryPage() {
           <tbody>
             {sales.map((sale) => (
               <tr key={sale.id}>
-                <td>#{sale.ticketNumber}</td>
+                <td>
+                  #{sale.ticketNumber}
+                  {sale.voucherFormatted && (
+                    <span className="muted"> · {sale.voucherFormatted}</span>
+                  )}
+                </td>
                 <td>{new Date(sale.createdAt).toLocaleTimeString('es-AR')}</td>
                 <td>{sale.user?.name ?? '—'}</td>
                 <td>${sale.total}</td>
