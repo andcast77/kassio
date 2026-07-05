@@ -14,6 +14,7 @@
     "migrate:dev": "prisma migrate dev",
     "migrate:deploy": "prisma migrate deploy",
     "db:seed": "tsx prisma/seed.ts",
+    "db:install-bootstrap": "tsx prisma/install-bootstrap.ts",
     "studio": "prisma studio",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },

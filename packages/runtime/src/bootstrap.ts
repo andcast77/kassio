@@ -117,9 +117,45 @@ export async function runSeedIfNeeded(databaseUrl: string): Promise<void> {
   }, backendRoot)
 }
 
+export async function runInstallBootstrap(databaseUrl: string): Promise<void> {
+  const { backendRoot, prismaDir } = resolvePaths()
+  const bundled = bundledBackendRoot()
+
+  if (bundled) {
+    const bootstrapJs = join(backendRoot, 'node_modules/@kassio/database/dist/prisma/install-bootstrap.js')
+    const bootstrapTs = join(backendRoot, 'node_modules/@kassio/database/prisma/install-bootstrap.ts')
+    const bootstrapEntry = existsSync(bootstrapJs) ? bootstrapJs : bootstrapTs
+    if (!existsSync(bootstrapEntry)) return
+
+    if (bootstrapEntry.endsWith('.ts')) {
+      await run(
+        process.execPath,
+        [tsxCli(backendRoot), bootstrapEntry],
+        { ...process.env, DATABASE_URL: databaseUrl },
+        prismaDir,
+      )
+    } else {
+      await run(
+        process.execPath,
+        [bootstrapEntry],
+        { ...process.env, DATABASE_URL: databaseUrl },
+        prismaDir,
+      )
+    }
+    return
+  }
+
+  await run('pnpm', ['--filter', '@kassio/database', 'db:install-bootstrap'], {
+    ...process.env,
+    DATABASE_URL: databaseUrl,
+  }, backendRoot)
+}
+
 export async function bootstrapDatabase(databaseUrl: string, options?: { seed?: boolean }): Promise<void> {
   await runMigrations(databaseUrl)
-  if (options?.seed !== false) {
+  if (options?.seed === true) {
     await runSeedIfNeeded(databaseUrl)
+  } else {
+    await runInstallBootstrap(databaseUrl)
   }
 }

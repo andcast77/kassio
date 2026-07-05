@@ -15,6 +15,7 @@ import { PosPage } from './pages/PosPage'
 import { SalesHistoryPage } from './pages/SalesHistoryPage'
 import { DashboardPage } from './pages/DashboardPage'
 import { CustomersPage } from './pages/CustomersPage'
+import { UpdateBanner } from './components/UpdateBanner'
 
 export function App() {
   const [user, setUser] = useState<AuthUser | null>(() => getStoredUser())
@@ -46,6 +47,7 @@ export function App() {
   if (!user) {
     return (
       <div className="page">
+        <UpdateBanner />
         <div className="card login-card">
           <p className="eyebrow">Kassio</p>
           <h1>Iniciar sesión</h1>
@@ -67,7 +69,9 @@ export function App() {
   }
 
   return (
-    <AppShell user={user} page={page} onNavigate={setPage} onLogout={handleLogout}>
+    <>
+      <UpdateBanner />
+      <AppShell user={user} page={page} onNavigate={setPage} onLogout={handleLogout}>
       {page === 'dashboard' && <DashboardPage />}
       {page === 'caja' && <CashPage />}
       {page === 'vender' && <PosPage />}
@@ -77,5 +81,6 @@ export function App() {
       {page === 'clientes' && <CustomersPage />}
       {page === 'compras' && <PurchasesPage />}
     </AppShell>
+    </>
   )
 }

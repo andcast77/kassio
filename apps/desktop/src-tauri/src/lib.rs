@@ -1,5 +1,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+mod updater;
+
 use std::process::{Child, Command, Stdio};
 use std::sync::Mutex;
 use tauri::{Manager, RunEvent};
@@ -39,8 +41,24 @@ fn spawn_bundled_backend(app: &tauri::App) -> Option<Child> {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    if updater::is_background_update_mode() {
+        return updater::run_background_updater();
+    }
+
+    if updater::pending_update_requested() {
+        if updater::spawn_detached_background_updater().is_ok() {
+            std::process::exit(0);
+        }
+    }
+
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
+        .plugin(tauri_plugin_updater::Builder::new().build())
+        .plugin(tauri_plugin_process::init())
+        .invoke_handler(tauri::generate_handler![
+            updater::begin_background_update,
+            updater::schedule_update_on_next_start,
+        ])
         .setup(|app| {
             if cfg!(not(debug_assertions)) {
                 if let Some(child) = spawn_bundled_backend(app) {

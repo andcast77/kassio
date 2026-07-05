@@ -82,9 +82,9 @@ HTTP → Controller → Service → Repository → Prisma
 | Aspecto | Decisión |
 |---------|----------|
 | Motor | Binarios PostgreSQL 14+ empaquetados **por plataforma** (Windows x64, Linux x64) |
-| Datos | Directorio de usuario de la app (no `Program Files`) |
+| Datos | Directorio **compartido por máquina** (todos los usuarios del SO) |
 | Arranque | Tauri/sidecar inicia Postgres como subproceso en `127.0.0.1` (puerto fijo reservado) |
-| Primer uso | Si no hay cluster: `initdb` → migraciones Prisma → seed (negocio + admin) |
+| Primer uso | Si no hay cluster: `initdb` → migraciones Prisma → bootstrap técnico (secuencias). Sin datos demo. |
 | Cierre | Al salir la app, apagar Postgres ordenadamente |
 | Neon (futuro) | Mismo esquema Prisma; solo cambia `DATABASE_URL` |
 
@@ -92,36 +92,40 @@ HTTP → Controller → Service → Repository → Prisma
 
 | SO | Ruta |
 |----|------|
-| Windows | `%LOCALAPPDATA%\Kassio\data\` |
-| Linux | `~/.local/share/kassio/data/` |
+| Windows | `%ProgramData%\Kassio\data\` (todos los usuarios) |
+| Linux (`.deb`) | `/var/lib/kassio/data/` (todos los usuarios) |
+| Desarrollo local | `~/.local/share/kassio/data/` |
 
 El cluster (`PGDATA`), logs y backups viven ahí. Desinstalar la app puede ofrecer conservar o borrar esa carpeta.
 
 ### Instalación para el usuario final
 
-Un solo artefacto por plataforma; flujo idéntico en Windows y Linux:
+> **Referencia completa:** [09-INSTALL-UPDATE.md](./09-INSTALL-UPDATE.md)
+
+Resumen:
 
 ```
-Instalador (.exe/.msi o .deb/AppImage)
-  → Siguiente, Finalizar
-  → Icono en escritorio / menú de aplicaciones
-  → Primera apertura: "Preparando tu caja…" (initdb + migraciones, ~30–60 s)
-  → Pantalla de login
+Instalador (.exe NSIS o .deb)
+  → Hook post-install: initdb + migraciones + bootstrap técnico (sin seed demo)
+  → Datos en carpeta compartida por máquina (ProgramData / /var/lib/kassio)
+  → Icono en menú / escritorio
+  → Apertura: arranque directo (Postgres + API); migraciones si hubo update
 ```
 
-**No incluye:** Docker, instalador de PostgreSQL oficial, Node/pnpm, abrir el navegador.
+**No incluye:** Docker, Postgres del sistema, Node/pnpm del sistema, datos demo de desarrollo.
 
 ### Contenido del paquete (producción)
 
 ```
 Kassio/
-├── kassio.exe / kassio            ← ventana Tauri (UI)
-├── api-server                     ← API Fastify (binario sidecar)
-├── resources/ui/                  ← build estático React
-└── resources/postgres/            ← binarios del motor (por SO)
+├── Kassio.exe / kassio            ← ventana Tauri (UI)
+└── resources/
+    ├── node/                      ← Node portable
+    ├── backend/                   ← API + setup/start.mjs + Prisma
+    └── (postgres vía embedded-postgres en runtime)
 ```
 
-CI genera builds separados; la lógica de arranque y rutas de datos es la misma.
+Ver [09-INSTALL-UPDATE.md](./09-INSTALL-UPDATE.md) para actualización in-app, CI y rutas exactas.
 
 ### Desarrollo
 

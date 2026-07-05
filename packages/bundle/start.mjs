@@ -7,7 +7,7 @@ import { initializeKassioData, isKassioInitialized, startRuntime, stopRuntime } 
 
 if (!isKassioInitialized()) {
   console.log('[kassio] first run without install setup — initializing now…')
-  await initializeKassioData({ seed: true })
+  await initializeKassioData({ seed: false })
 }
 
 const state = await startRuntime({ seed: false })

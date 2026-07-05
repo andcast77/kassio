@@ -1,3 +1,7 @@
+/**
+ * Development/demo seed — demo business, users, products.
+ * Production installs use install-bootstrap.ts (migrations + sequences only).
+ */
 import { config } from 'dotenv'
 import { resolve, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'

@@ -9,7 +9,7 @@
 | Usuarios | Varios (cajeros + admin) |
 | Red | Sin dependencia de internet |
 | SO objetivo | Windows y Linux (instalable); desarrollo en cualquier SO |
-| BD | PostgreSQL embebido (incluido en el instalador; datos en carpeta de usuario) |
+| BD | PostgreSQL embebido (incluido en el instalador; datos compartidos por máquina — ver [09-INSTALL-UPDATE.md](./09-INSTALL-UPDATE.md)) |
 | Pantalla | **Solo desktop** — diseño general **1360×768**; piso mínimo 1280×720 |
 
 ### Resolución de diseño

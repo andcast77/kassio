@@ -1,1 +1,1 @@
-{"default":{"identifier":"default","description":"Default capabilities for Kassio","local":true,"windows":["main"],"permissions":["core:default","shell:allow-spawn","shell:allow-kill"]}}
+{"default":{"identifier":"default","description":"Default capabilities for Kassio","local":true,"windows":["main"],"permissions":["core:default","shell:allow-spawn","shell:allow-kill","updater:default","process:allow-restart"]}}

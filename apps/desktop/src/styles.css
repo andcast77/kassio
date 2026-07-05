@@ -1308,6 +1308,71 @@ h2 {
   color: #ff9f9f;
 }
 
+.update-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.65rem 1.25rem;
+  background: linear-gradient(90deg, #1a2a4a 0%, #1e3a5f 100%);
+  border-bottom: 1px solid #2d5a8a;
+  color: #e8f0ff;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+}
+
+.update-banner-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  font-size: 0.88rem;
+}
+
+.update-banner-body strong {
+  font-size: 0.95rem;
+}
+
+.update-banner-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.update-banner-actions button {
+  padding: 0.45rem 0.85rem;
+  font-size: 0.85rem;
+}
+
+.update-banner-spinner {
+  width: 1.1rem;
+  height: 1.1rem;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: update-spin 0.7s linear infinite;
+}
+
+@keyframes update-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.page:has(.update-banner),
+.app-layout:has(~ .update-banner) {
+  padding-top: 0;
+}
+
+body:has(.update-banner) .page,
+body:has(.update-banner) .app-layout {
+  padding-top: 3.25rem;
+}
+
 .pos-products {
   display: flex;
   flex-direction: column;

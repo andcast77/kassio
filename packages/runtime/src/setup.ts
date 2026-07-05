@@ -21,7 +21,7 @@ export async function markKassioInitialized(): Promise<void> {
   await writeFile(getSetupMarkerPath(), `${new Date().toISOString()}\n`, 'utf8')
 }
 
-/** One-shot: init Postgres, migrate, seed, then stop. Used by the installer. */
+/** One-shot: init Postgres, migrate, install bootstrap. Used by the installer. */
 export async function initializeKassioData(options?: { seed?: boolean }): Promise<void> {
   if (isKassioInitialized()) {
     console.log('[kassio] data already initialized — skipping setup')
@@ -34,7 +34,7 @@ export async function initializeKassioData(options?: { seed?: boolean }): Promis
   process.env.DATABASE_URL = databaseUrl
 
   try {
-    await bootstrapDatabase(databaseUrl, { seed: options?.seed ?? true })
+    await bootstrapDatabase(databaseUrl, { seed: options?.seed ?? false })
     await markKassioInitialized()
     console.log('[kassio] database ready')
   } finally {
