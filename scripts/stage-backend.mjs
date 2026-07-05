@@ -11,6 +11,7 @@ import { pipeline } from 'node:stream/promises'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const repoRoot = join(__dirname, '..')
+const installDir = resolve(repoRoot, 'apps/desktop/src-tauri/install')
 const resourcesRoot = resolve(repoRoot, 'apps/desktop/src-tauri/resources')
 const backendRoot = resolve(resourcesRoot, 'backend')
 const nodeRoot = resolve(resourcesRoot, 'node')
@@ -92,8 +93,14 @@ async function stageBackend() {
   )
 }
 
+function stageInstallHelpers() {
+  const cmdSrc = join(installDir, 'install-setup.cmd')
+  cpSync(cmdSrc, join(resourcesRoot, 'install-setup.cmd'))
+}
+
 const target = detectTarget()
 console.log(`[stage-backend] target=${target}`)
 await stageBackend()
 await stageNode(target)
+stageInstallHelpers()
 console.log(`[stage-backend] ready: ${resourcesRoot}`)

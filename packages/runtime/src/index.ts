@@ -10,6 +10,12 @@ export {
   type EmbeddedPostgresHandle,
 } from './postgres.js'
 export { bootstrapDatabase, runMigrations, runSeedIfNeeded } from './bootstrap.js'
+export {
+  getSetupMarkerPath,
+  isKassioInitialized,
+  markKassioInitialized,
+  initializeKassioData,
+} from './setup.js'
 
 import {
   buildDatabaseUrl,
@@ -27,7 +33,8 @@ export async function startRuntime(options?: { seed?: boolean }): Promise<Runtim
   const postgres = await startEmbeddedPostgres()
   const databaseUrl = buildDatabaseUrl()
   process.env.DATABASE_URL = databaseUrl
-  await bootstrapDatabase(databaseUrl, options)
+  const seed = options?.seed ?? false
+  await bootstrapDatabase(databaseUrl, { seed })
   return { databaseUrl, postgres }
 }
 

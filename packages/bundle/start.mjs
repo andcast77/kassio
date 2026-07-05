@@ -1,11 +1,16 @@
 #!/usr/bin/env node
 /**
- * Production backend entry — embedded Postgres, migrations, seed, API.
- * Bundled inside the Tauri app; uses process.execPath (bundled Node).
+ * Production backend — starts API only (DB prepared at install time).
+ * Falls back to one-time setup if the installer hook did not run.
  */
-import { startRuntime, stopRuntime } from '@kassio/runtime'
+import { initializeKassioData, isKassioInitialized, startRuntime, stopRuntime } from '@kassio/runtime'
 
-const state = await startRuntime({ seed: true })
+if (!isKassioInitialized()) {
+  console.log('[kassio] first run without install setup — initializing now…')
+  await initializeKassioData({ seed: true })
+}
+
+const state = await startRuntime({ seed: false })
 await import('@kassio/api/dist/server.js')
 
 const shutdown = async (signal) => {
