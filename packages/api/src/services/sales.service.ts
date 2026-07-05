@@ -8,6 +8,7 @@ import {
   resolvePosVoucherType,
   serializeOptionalFiscalFields,
   serializeVoucherFields,
+  type AfipVoucherTypeCode,
 } from '../lib/voucher.js'
 import { getBusinessPuntoVenta } from './business.service.js'
 
@@ -137,7 +138,7 @@ export async function peekNextVoucherNumber(puntoVenta: number, voucherType: num
 /** Vista previa del próximo comprobante fiscal (sin reservar). Para UI de facturación. */
 export async function peekPosVoucherForCustomer(customerId?: string | null) {
   const puntoVenta = await getBusinessPuntoVenta()
-  let voucherType = DEFAULT_POS_VOUCHER_TYPE
+  let voucherType: AfipVoucherTypeCode = DEFAULT_POS_VOUCHER_TYPE
   if (customerId) {
     const customer = await prisma.customer.findUnique({
       where: { id: customerId },

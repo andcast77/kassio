@@ -1,22 +1,39 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use std::process::{Child, Command};
+use std::process::{Child, Command, Stdio};
 use std::sync::Mutex;
-use tauri::Manager;
+use tauri::{Manager, RunEvent};
 
 struct BackendState(Mutex<Option<Child>>);
 
-fn spawn_backend() -> Option<Child> {
-    let manifest_dir = env!("CARGO_MANIFEST_DIR");
-    let repo_root = std::path::Path::new(manifest_dir)
-        .join("..")
-        .join("..")
-        .join("..");
+fn spawn_bundled_backend(app: &tauri::App) -> Option<Child> {
+    let resource_dir = app.path().resource_dir().ok()?;
+    let backend_root = resource_dir.join("backend");
 
-    Command::new("node")
-        .arg(repo_root.join("scripts/kassio-start.mjs"))
-        .current_dir(&repo_root)
+    let node = if cfg!(target_os = "windows") {
+        resource_dir.join("node").join("node.exe")
+    } else {
+        resource_dir.join("node").join("node")
+    };
+
+    let start_script = backend_root.join("start.mjs");
+    if !node.exists() || !start_script.exists() {
+        eprintln!(
+            "[kassio] bundled backend missing (node={:?}, start={:?})",
+            node, start_script
+        );
+        return None;
+    }
+
+    Command::new(&node)
+        .arg(&start_script)
+        .current_dir(&backend_root)
+        .env("KASSIO_BACKEND_ROOT", &backend_root)
+        .env("NODE_ENV", "production")
+        .stdout(Stdio::inherit())
+        .stderr(Stdio::inherit())
         .spawn()
+        .map_err(|e| eprintln!("[kassio] failed to spawn backend: {e}"))
         .ok()
 }
 
@@ -26,12 +43,23 @@ pub fn run() {
         .plugin(tauri_plugin_shell::init())
         .setup(|app| {
             if cfg!(not(debug_assertions)) {
-                if let Some(child) = spawn_backend() {
+                if let Some(child) = spawn_bundled_backend(app) {
                     app.manage(BackendState(Mutex::new(Some(child))));
                 }
             }
             Ok(())
         })
-        .run(tauri::generate_context!())
-        .expect("error while running tauri application");
+        .build(tauri::generate_context!())
+        .expect("error while building tauri application")
+        .run(|app_handle, event| {
+            if let RunEvent::Exit = event {
+                if let Some(state) = app_handle.try_state::<BackendState>() {
+                    if let Ok(mut guard) = state.0.lock() {
+                        if let Some(mut child) = guard.take() {
+                            let _ = child.kill();
+                        }
+                    }
+                }
+            }
+        });
 }

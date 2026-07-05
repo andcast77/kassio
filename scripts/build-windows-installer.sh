@@ -15,6 +15,7 @@ done
 source "${HOME}/.cargo/env"
 
 cd "${ROOT}/apps/desktop"
+node "${ROOT}/scripts/stage-backend.mjs" --target=windows
 pnpm tauri build -r cargo-xwin -t x86_64-pc-windows-msvc -b nsis
 
 INSTALLER="${ROOT}/apps/desktop/src-tauri/target/x86_64-pc-windows-msvc/release/bundle/nsis/Kassio_"*"_x64-setup.exe"

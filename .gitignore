@@ -8,3 +8,5 @@ build/
 .DS_Store
 *.tsbuildinfo
 apps/desktop/src-tauri/target/
+apps/desktop/src-tauri/resources/
+.cache/

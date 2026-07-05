@@ -1,0 +1,16 @@
+{
+  "name": "@kassio/bundle",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node start.mjs"
+  },
+  "dependencies": {
+    "@kassio/api": "workspace:*",
+    "@kassio/database": "workspace:*",
+    "@kassio/runtime": "workspace:*",
+    "prisma": "^6.3.1",
+    "tsx": "^4.19.2"
+  }
+}
