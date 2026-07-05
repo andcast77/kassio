@@ -9,6 +9,6 @@
     "shell:allow-kill",
     "updater:default",
     "process:allow-restart",
-    "core:app:allow-app-exit"
+    "process:allow-exit"
   ]
 }
