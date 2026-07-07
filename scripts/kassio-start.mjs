@@ -11,7 +11,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 const repoRoot = join(__dirname, '..')
 
 async function main() {
-  const { startRuntime, stopRuntime } = await import('../packages/runtime/src/index.ts')
+  const { startRuntime, stopRuntime } = await import('../packages/runtime/dist/index.js')
 
   console.log('[kassio] Starting embedded PostgreSQL…')
   const runtime = await startRuntime({ seed: true })

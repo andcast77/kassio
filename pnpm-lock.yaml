@@ -55,27 +55,6 @@ importers:
         specifier: ^3.0.5
         version: 3.2.6(@types/node@22.20.0)(jiti@2.7.0)(tsx@4.22.4)
 
-  apps/desktop/src-tauri/resources/backend:
-    dependencies:
-      '@kassio/api':
-        specifier: workspace:*
-        version: link:../../../../../packages/api
-      '@kassio/database':
-        specifier: workspace:*
-        version: link:../../../../../packages/database
-      '@kassio/runtime':
-        specifier: workspace:*
-        version: link:../../../../../packages/runtime
-      '@prisma/client':
-        specifier: 6.19.3
-        version: 6.19.3(prisma@6.19.3(typescript@5.9.3))(typescript@5.9.3)
-      prisma:
-        specifier: ^6.3.1
-        version: 6.19.3(typescript@5.9.3)
-      tsx:
-        specifier: ^4.19.2
-        version: 4.22.4
-
   packages/api:
     dependencies:
       '@fastify/cors':
@@ -168,6 +147,10 @@ importers:
   packages/runtime:
     dependencies:
       embedded-postgres:
+        specifier: ^17.5.0-beta.15
+        version: 17.5.0-beta.15
+    optionalDependencies:
+      '@embedded-postgres/windows-x64':
         specifier: ^17.5.0-beta.15
         version: 17.5.0-beta.15
     devDependencies:

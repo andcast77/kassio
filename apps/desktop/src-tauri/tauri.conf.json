@@ -4,7 +4,7 @@
   "version": "0.1.4",
   "identifier": "app.kassio.desktop",
   "build": {
-    "beforeDevCommand": "pnpm --dir ../.. dev:embedded:ui",
+    "beforeDevCommand": "pnpm --dir ../.. dev",
     "devUrl": "http://127.0.0.1:5173",
     "beforeBuildCommand": "pnpm build && node ../../scripts/stage-backend.mjs",
     "frontendDist": "../dist"

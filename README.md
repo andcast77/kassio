@@ -10,23 +10,16 @@ Proyecto independiente de [multisystem](../multisystem). Shopflow es referencia 
 
 - Node.js 20+
 - pnpm (`corepack enable`)
-- Docker (opcional — solo Postgres en dev clásico)
 - Rust (solo para build Tauri / instaladores)
 
 ### Primer arranque
 
 ```bash
 pnpm install
-pnpm db:setup    # Docker Postgres + migrate + seed
-pnpm dev         # API :3000 + UI :5173
+pnpm dev   # Postgres embebido + migrate + seed + API :3000 + UI :5173
 ```
 
-**Sin Docker** (mismo flujo que producción):
-
-```bash
-pnpm install
-pnpm dev:embedded   # Postgres embebido + API + UI
-```
+Mismo motor Postgres que producción — no requiere Docker ni Postgres del sistema.
 
 Abrí http://127.0.0.1:5173
 
@@ -40,10 +33,8 @@ Abrí http://127.0.0.1:5173
 | Comando | Qué hace |
 |---------|----------|
 | `pnpm setup` | Copia `.env.example` → `.env` (si faltan) |
-| `pnpm dev` | API + UI (Docker Postgres) |
-| `pnpm dev:embedded` | API + UI + Postgres embebido |
+| `pnpm dev` | Postgres embebido + API + UI |
 | `pnpm start:embedded` | Postgres embebido + API (producción-like) |
-| `pnpm db:setup` | Setup completo de BD con Docker |
 | `pnpm test` | Tests API + runtime embebido |
 | `pnpm typecheck` | TypeScript en todo el monorepo |
 | `pnpm --filter @kassio/desktop tauri:dev` | Ventana nativa Tauri (requiere Rust) |

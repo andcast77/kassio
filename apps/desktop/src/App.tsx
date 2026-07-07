@@ -44,43 +44,40 @@ export function App() {
     clearSession()
   }
 
-  if (!user) {
-    return (
-      <div className="page">
-        <UpdateBanner />
-        <div className="card login-card">
-          <p className="eyebrow">Kassio</p>
-          <h1>Iniciar sesión</h1>
-          <form onSubmit={handleLogin} className="stack">
-            <label>
-              Correo
-              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-            </label>
-            <label>
-              Contraseña
-              <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-            </label>
-            {error && <p className="error">{error}</p>}
-            <button type="submit" disabled={loading}>{loading ? 'Entrando…' : 'Entrar'}</button>
-          </form>
-        </div>
-      </div>
-    )
-  }
-
   return (
     <>
       <UpdateBanner />
-      <AppShell user={user} page={page} onNavigate={setPage} onLogout={handleLogout}>
-      {page === 'dashboard' && <DashboardPage />}
-      {page === 'caja' && <CashPage />}
-      {page === 'vender' && <PosPage />}
-      {page === 'ventas' && <SalesHistoryPage />}
-      {page === 'productos' && <ProductsPage />}
-      {page === 'categorias' && <CategoriesPage />}
-      {page === 'clientes' && <CustomersPage />}
-      {page === 'compras' && <PurchasesPage />}
-    </AppShell>
+      {!user ? (
+        <div className="page">
+          <div className="card login-card">
+            <p className="eyebrow">Kassio</p>
+            <h1>Iniciar sesión</h1>
+            <form onSubmit={handleLogin} className="stack">
+              <label>
+                Correo
+                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+              </label>
+              <label>
+                Contraseña
+                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+              </label>
+              {error && <p className="error">{error}</p>}
+              <button type="submit" disabled={loading}>{loading ? 'Entrando…' : 'Entrar'}</button>
+            </form>
+          </div>
+        </div>
+      ) : (
+        <AppShell user={user} page={page} onNavigate={setPage} onLogout={handleLogout}>
+          {page === 'dashboard' && <DashboardPage />}
+          {page === 'caja' && <CashPage />}
+          {page === 'vender' && <PosPage />}
+          {page === 'ventas' && <SalesHistoryPage />}
+          {page === 'productos' && <ProductsPage />}
+          {page === 'categorias' && <CategoriesPage />}
+          {page === 'clientes' && <CustomersPage />}
+          {page === 'compras' && <PurchasesPage />}
+        </AppShell>
+      )}
     </>
   )
 }

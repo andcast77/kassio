@@ -40,7 +40,7 @@
 
 - Shell Tauri 2 (`apps/desktop/src-tauri`) — ventana 1360×768, mín 1280×720
 - Runtime embebido (`packages/runtime`) — Postgres local + migrate + seed
-- Scripts: `pnpm dev:embedded`, `pnpm start:embedded`
+- Scripts: `pnpm dev`, `pnpm start:embedded`
 - Build instaladores: `pnpm --filter @kassio/desktop tauri:build` (requiere Rust)
 
 **Criterio de salida:** app instalable sin Docker ni Postgres aparte. ✅ (runtime + Tauri scaffold)

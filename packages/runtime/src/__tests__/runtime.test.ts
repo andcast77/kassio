@@ -23,7 +23,7 @@ describe('embedded runtime', () => {
   it('connects and runs migrations', async () => {
     const url = buildDatabaseUrl()
     await bootstrapDatabase(url, { seed: false })
-    const client = pg.getPgClient()
+    const client = pg.pg.getPgClient()
     await client.connect()
     const result = await client.query('SELECT 1 AS ok')
     expect(result.rows[0].ok).toBe(1)

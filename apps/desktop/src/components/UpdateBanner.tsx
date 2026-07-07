@@ -5,7 +5,7 @@ import {
   scheduleUpdateOnNextStart,
   type PendingUpdate,
 } from '../lib/appUpdater'
-import { isPackagedTauriApp } from '../lib/tauriRuntime'
+import { isTauriRuntime } from '../lib/tauriRuntime'
 
 type Phase = 'idle' | 'checking' | 'available' | 'error'
 
@@ -15,7 +15,7 @@ export function UpdateBanner() {
   const [error, setError] = useState<string | null>(null)
 
   const runCheck = useCallback(async () => {
-    if (!isPackagedTauriApp()) return
+    if (!isTauriRuntime()) return
     setPhase('checking')
     try {
       const pending = await checkForAppUpdate()
@@ -61,11 +61,12 @@ export function UpdateBanner() {
     }
   }
 
-  if (phase === 'idle' || phase === 'checking') return null
+  if (phase === 'idle') return null
 
   return (
     <div className="update-banner" role="status" aria-live="polite">
       <div className="update-banner-body">
+        {phase === 'checking' && <strong>Buscando actualizaciones…</strong>}
         {phase === 'available' && (
           <>
             <strong>Actualización disponible</strong>

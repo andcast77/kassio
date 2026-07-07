@@ -1,4 +1,4 @@
-import { isPackagedTauriApp } from './tauriRuntime'
+import { isTauriRuntime } from './tauriRuntime'
 
 export type PendingUpdate = {
   version: string
@@ -6,7 +6,7 @@ export type PendingUpdate = {
 }
 
 export async function checkForAppUpdate(): Promise<PendingUpdate | null> {
-  if (!isPackagedTauriApp()) return null
+  if (!isTauriRuntime()) return null
 
   const { check } = await import('@tauri-apps/plugin-updater')
   const update = await check()
