@@ -49,7 +49,13 @@ export async function startEmbeddedPostgres(): Promise<EmbeddedPostgresHandle> {
 
   let winProcess: PostgresLauncherProcess | undefined
   if (platform() === 'win32') {
-    const { postgres: postgresBinary } = await import('@embedded-postgres/windows-x64')
+    // Windows-only optional dependency. The specifier is kept out of a static
+    // string literal so `tsc` does not try to resolve its types on non-Windows
+    // platforms (where the package is not installed and this branch never runs).
+    const winPostgresPackage = '@embedded-postgres/windows-x64'
+    const { postgres: postgresBinary } = (await import(winPostgresPackage)) as {
+      postgres: string
+    }
     winProcess = await spawnPostgresUnprivileged(postgresBinary, databaseDir, getPgPort(), (message) =>
       console.log(message),
     )

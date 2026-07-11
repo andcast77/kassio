@@ -10,7 +10,7 @@
     "typecheck": "tsc -b --noEmit",
     "test": "vitest run",
     "tauri": "tauri",
-    "tauri:dev": "tauri dev",
+    "tauri:dev": "cross-env WEBKIT_DISABLE_DMABUF_RENDERER=1 tauri dev",
     "tauri:build": "tauri build",
     "tauri:build:windows": "tauri build -r cargo-xwin -t x86_64-pc-windows-msvc -b nsis"
   },
@@ -26,6 +26,7 @@
     "@types/react": "^19.0.7",
     "@types/react-dom": "^19.0.3",
     "@vitejs/plugin-react": "^4.3.4",
+    "cross-env": "^7.0.3",
     "typescript": "^5.7.3",
     "vite": "^6.0.7",
     "vitest": "^3.0.5"

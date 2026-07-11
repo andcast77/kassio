@@ -9,6 +9,8 @@
     "start:embedded": "node scripts/kassio-start.mjs",
     "dev:api": "pnpm --filter @kassio/api dev",
     "dev:desktop": "pnpm --filter @kassio/desktop dev",
+    "tauri:dev": "pnpm --filter @kassio/desktop tauri:dev",
+    "tauri:build": "pnpm --filter @kassio/desktop tauri:build",
     "db:migrate": "pnpm --filter @kassio/database migrate:dev",
     "db:seed": "pnpm --filter @kassio/database db:seed",
     "db:studio": "pnpm --filter @kassio/database studio",

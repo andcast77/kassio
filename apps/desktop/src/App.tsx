@@ -16,6 +16,7 @@ import { SalesHistoryPage } from './pages/SalesHistoryPage'
 import { DashboardPage } from './pages/DashboardPage'
 import { CustomersPage } from './pages/CustomersPage'
 import { UpdateBanner } from './components/UpdateBanner'
+import { AppVersionBadge } from './components/AppVersionBadge'
 
 export function App() {
   const [user, setUser] = useState<AuthUser | null>(() => getStoredUser())
@@ -47,6 +48,7 @@ export function App() {
   return (
     <>
       <UpdateBanner />
+      <AppVersionBadge />
       {!user ? (
         <div className="page">
           <div className="card login-card">
