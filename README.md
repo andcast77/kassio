@@ -16,12 +16,12 @@ Proyecto independiente de [multisystem](../multisystem). Shopflow es referencia 
 
 ```bash
 pnpm install
-pnpm dev   # Postgres embebido + migrate + seed + API :3000 + UI :5173
+pnpm dev   # Postgres embebido + migrate + seed + API :3000 + UI :1420
 ```
 
 Mismo motor Postgres que producción — no requiere Docker ni Postgres del sistema.
 
-Abrí http://127.0.0.1:5173
+Abrí http://127.0.0.1:1420
 
 | Usuario | Correo | Contraseña |
 |---------|--------|------------|

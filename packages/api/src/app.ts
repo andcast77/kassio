@@ -18,7 +18,7 @@ export async function buildApp(options?: { logger?: boolean }): Promise<FastifyI
   const app = Fastify({ logger: options?.logger ?? false })
 
   await app.register(cors, {
-    origin: ['http://127.0.0.1:5173', 'http://localhost:5173'],
+    origin: ['http://127.0.0.1:1420', 'http://localhost:1420'],
     credentials: true,
   })
 
