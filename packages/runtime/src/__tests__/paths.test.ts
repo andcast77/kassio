@@ -17,7 +17,7 @@ describe('getKassioDataDir', () => {
     vi.stubEnv('KASSIO_BACKEND_ROOT', '/usr/lib/Kassio/backend')
     const { getKassioDataDir } = await import('../paths.js')
     if (process.platform === 'win32') {
-      expect(getKassioDataDir()).toMatch(/ProgramData[\\/]Kassio[\\/]data/)
+      expect(getKassioDataDir()).toMatch(/Local[\\/]Kassio[\\/]data/)
     } else {
       expect(getKassioDataDir()).toBe('/var/lib/kassio/data')
     }

@@ -1,13 +1,13 @@
 import { homedir } from 'node:os'
 import { join } from 'node:path'
 
-/** Shared data dir for all OS users on this machine (production installs). */
+/** Per-user data dir (production installs run under a single Windows account). */
 export function getKassioDataDir(): string {
   if (process.env.KASSIO_DATA_DIR) {
     return process.env.KASSIO_DATA_DIR
   }
   if (process.platform === 'win32') {
-    const base = process.env.ProgramData ?? join('C:', 'ProgramData')
+    const base = process.env.LOCALAPPDATA ?? join(homedir(), 'AppData', 'Local')
     return join(base, 'Kassio', 'data')
   }
   if (process.env.KASSIO_BACKEND_ROOT) {

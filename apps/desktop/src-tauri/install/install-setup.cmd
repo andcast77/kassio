@@ -3,15 +3,9 @@ setlocal
 set "ROOT=%~dp0"
 set "ROOT=%ROOT:~0,-1%"
 set "KASSIO_BACKEND_ROOT=%ROOT%\backend"
-set "KASSIO_DATA_DIR=%ProgramData%\Kassio\data"
+rem Data dir resolves to the per-user location (%LOCALAPPDATA%\Kassio\data) via
+rem @kassio/runtime paths.ts. Per-user install runs unprivileged, so no icacls
+rem grant is needed and PostgreSQL starts without the admin restriction.
 
 "%ROOT%\node\node.exe" "%ROOT%\backend\setup.mjs"
-set "SETUP_EXIT=%ERRORLEVEL%"
-if %SETUP_EXIT% neq 0 exit /b %SETUP_EXIT%
-
-if exist "%ProgramData%\Kassio" (
-  rem Grant Modify to Users so any Windows account can use the shared DB.
-  icacls "%ProgramData%\Kassio" /grant *S-1-5-32-545:(OI)(CI)M /T >nul 2>&1
-)
-
-exit /b 0
+exit /b %ERRORLEVEL%

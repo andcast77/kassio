@@ -27,14 +27,24 @@ fn spawn_bundled_backend(app: &tauri::App) -> Option<Child> {
         return None;
     }
 
-    Command::new(&node)
-        .arg(&start_script)
+    let mut cmd = Command::new(&node);
+    cmd.arg(&start_script)
         .current_dir(&backend_root)
         .env("KASSIO_BACKEND_ROOT", &backend_root)
         .env("NODE_ENV", "production")
         .stdout(Stdio::inherit())
-        .stderr(Stdio::inherit())
-        .spawn()
+        .stderr(Stdio::inherit());
+
+    // Keep the bundled Node backend headless — otherwise Windows allocates a
+    // console window that flashes up behind the app.
+    #[cfg(windows)]
+    {
+        use std::os::windows::process::CommandExt;
+        const CREATE_NO_WINDOW: u32 = 0x08000000;
+        cmd.creation_flags(CREATE_NO_WINDOW);
+    }
+
+    cmd.spawn()
         .map_err(|e| eprintln!("[kassio] failed to spawn backend: {e}"))
         .ok()
 }

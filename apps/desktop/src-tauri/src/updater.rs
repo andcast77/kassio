@@ -15,7 +15,9 @@ pub fn is_background_update_mode() -> bool {
 fn kassio_state_dir() -> PathBuf {
     #[cfg(windows)]
     {
-        let base = std::env::var("ProgramData").unwrap_or_else(|_| "C:\\ProgramData".into());
+        let base = std::env::var("LOCALAPPDATA")
+            .or_else(|_| std::env::var("USERPROFILE").map(|p| format!("{p}\\AppData\\Local")))
+            .unwrap_or_else(|_| "C:\\Users\\Default\\AppData\\Local".into());
         PathBuf::from(base).join("Kassio")
     }
     #[cfg(not(windows))]
